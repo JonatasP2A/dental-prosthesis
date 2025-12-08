@@ -6,14 +6,14 @@ server:
   host: "0.0.0.0"
 
 clerk:
-  # Get your JWKS URL from Clerk Dashboard
-  # Format: https://<your-clerk-domain>/.well-known/jwks.json
-  jwks_url: "https://your-clerk-domain.clerk.accounts.dev/.well-known/jwks.json"
+  # Clerk Secret Key is required for JWT token verification
+  # Get your Secret Key from Clerk Dashboard: https://dashboard.clerk.com/~/api-keys
+  # The SDK will automatically fetch JWKS (JSON Web Key Set) using this secret key
   secret_key: "sk_test_your_secret_key"
+  # Note: jwks_url is no longer needed - the SDK handles JWKS fetching automatically
 
 # Environment variables can also be used:
 # DENTAL_SERVER_PORT=8080
 # DENTAL_SERVER_HOST=0.0.0.0
-# CLERK_JWKS_URL=https://...
-# CLERK_SECRET_KEY=sk_test_...
+# CLERK_SECRET_KEY=sk_test_your_secret_key_here
 

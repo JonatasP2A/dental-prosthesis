@@ -27,12 +27,13 @@ func main() {
 
 	// Initialize Clerk middleware (optional - only if configured)
 	var clerkMiddleware *auth.ClerkMiddleware
-	if cfg.Clerk.JWKSURL != "" {
+	if cfg.Clerk.SecretKey != "" {
+		log.Println("Clerk Secret Key configured, authentication enabled")
 		clerkMiddleware = auth.NewClerkMiddleware(auth.ClerkConfig{
-			JWKSURL: cfg.Clerk.JWKSURL,
+			SecretKey: cfg.Clerk.SecretKey,
 		})
 	} else {
-		log.Println("Warning: Clerk JWKS URL not configured, authentication disabled")
+		log.Println("Warning: Clerk Secret Key not configured, authentication disabled")
 	}
 
 	// Create router

@@ -2,16 +2,14 @@ package auth
 
 import (
 	"context"
-	"crypto/rsa"
-	"encoding/base64"
-	"encoding/json"
 	"fmt"
-	"math/big"
 	"net/http"
 	"strings"
 	"sync"
-	"time"
 
+	"github.com/clerk/clerk-sdk-go/v2"
+	"github.com/clerk/clerk-sdk-go/v2/jwks"
+	"github.com/clerk/clerk-sdk-go/v2/jwt"
 	"github.com/gin-gonic/gin"
 )
 
@@ -27,29 +25,20 @@ const (
 
 // ClerkConfig holds Clerk configuration
 type ClerkConfig struct {
-	JWKSURL string
+	SecretKey string
 }
 
 // ClerkMiddleware provides JWT authentication middleware for Clerk
 type ClerkMiddleware struct {
 	config    ClerkConfig
-	jwks      *JWKS
-	jwksMu    sync.RWMutex
-	jwksCache time.Time
+	jwksClient *jwks.Client
+	jwkStore   *JWKStore
+	jwkMu      sync.RWMutex
 }
 
-// JWKS represents JSON Web Key Set
-type JWKS struct {
-	Keys []JWK `json:"keys"`
-}
-
-// JWK represents a JSON Web Key
-type JWK struct {
-	Kty string `json:"kty"`
-	Kid string `json:"kid"`
-	Use string `json:"use"`
-	N   string `json:"n"`
-	E   string `json:"e"`
+// JWKStore stores the cached JSON Web Key
+type JWKStore struct {
+	jwk *clerk.JSONWebKey
 }
 
 // Claims represents JWT claims from Clerk
@@ -60,10 +49,25 @@ type Claims struct {
 	Iat          int64  `json:"iat"`
 }
 
+// CustomClaims represents custom JWT claims that may include laboratory_id
+type CustomClaims struct {
+	LaboratoryID string `json:"laboratory_id"`
+}
+
 // NewClerkMiddleware creates a new Clerk middleware
 func NewClerkMiddleware(config ClerkConfig) *ClerkMiddleware {
+	// Set the Clerk secret key for SDK initialization
+	clerk.SetKey(config.SecretKey)
+
+	// Create JWKS client
+	clientConfig := &clerk.ClientConfig{}
+	clientConfig.Key = clerk.String(config.SecretKey)
+	jwksClient := jwks.NewClient(clientConfig)
+
 	return &ClerkMiddleware{
-		config: config,
+		config:     config,
+		jwksClient: jwksClient,
+		jwkStore:   &JWKStore{},
 	}
 }
 
@@ -87,7 +91,7 @@ func (m *ClerkMiddleware) Authenticate() gin.HandlerFunc {
 		}
 
 		token := parts[1]
-		claims, err := m.validateToken(token)
+		claims, err := m.validateToken(c.Request.Context(), token)
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
 				"error": fmt.Sprintf("invalid token: %v", err),
@@ -112,82 +116,88 @@ func (m *ClerkMiddleware) Authenticate() gin.HandlerFunc {
 	}
 }
 
-// validateToken validates a JWT token
-func (m *ClerkMiddleware) validateToken(tokenString string) (*Claims, error) {
-	// Split token parts
-	parts := strings.Split(tokenString, ".")
-	if len(parts) != 3 {
-		return nil, fmt.Errorf("invalid token format")
+// validateToken validates a JWT token using Clerk SDK
+func (m *ClerkMiddleware) validateToken(ctx context.Context, tokenString string) (*Claims, error) {
+	// Try to get cached JWK
+	jwk := m.getJWK()
+	
+	if jwk == nil {
+		// Decode token to get key ID (without verification)
+		unsafeClaims, err := jwt.Decode(ctx, &jwt.DecodeParams{
+			Token: tokenString,
+		})
+		if err != nil {
+			return nil, fmt.Errorf("failed to decode token: %w", err)
+		}
+
+		// Fetch the JSON Web Key using the key ID
+		jwk, err = jwt.GetJSONWebKey(ctx, &jwt.GetJSONWebKeyParams{
+			KeyID:      unsafeClaims.KeyID,
+			JWKSClient: m.jwksClient,
+		})
+		if err != nil {
+			return nil, fmt.Errorf("failed to fetch JWK: %w", err)
+		}
+
+		// Cache the JWK
+		m.setJWK(jwk)
 	}
 
-	// Decode payload (without verification for now - in production use proper JWT library)
-	payload, err := base64.RawURLEncoding.DecodeString(parts[1])
+	// Verify the token signature and claims with custom claims parsing
+	var customClaims *CustomClaims
+	verifiedClaims, err := jwt.Verify(ctx, &jwt.VerifyParams{
+		Token: tokenString,
+		JWK:   jwk,
+		CustomClaimsConstructor: func(_ context.Context) any {
+			return &CustomClaims{}
+		},
+	})
 	if err != nil {
-		return nil, fmt.Errorf("failed to decode payload: %w", err)
+		return nil, fmt.Errorf("token verification failed: %w", err)
 	}
 
-	var claims Claims
-	if err := json.Unmarshal(payload, &claims); err != nil {
-		return nil, fmt.Errorf("failed to parse claims: %w", err)
+	// Extract custom claims if present
+	if verifiedClaims.Custom != nil {
+		if cc, ok := verifiedClaims.Custom.(*CustomClaims); ok {
+			customClaims = cc
+		}
 	}
 
-	// Check expiration
-	if claims.Exp < time.Now().Unix() {
-		return nil, fmt.Errorf("token expired")
+	// Convert Clerk claims to our Claims struct
+	claims := &Claims{
+		Sub: verifiedClaims.Subject,
 	}
 
-	return &claims, nil
+	// Extract expiration time (Expiry field from RegisteredClaims)
+	if verifiedClaims.Expiry != nil {
+		claims.Exp = *verifiedClaims.Expiry
+	}
+
+	// Extract issued at time
+	if verifiedClaims.IssuedAt != nil {
+		claims.Iat = *verifiedClaims.IssuedAt
+	}
+
+	// Extract laboratory_id from custom claims
+	if customClaims != nil && customClaims.LaboratoryID != "" {
+		claims.LaboratoryID = customClaims.LaboratoryID
+	}
+
+	return claims, nil
 }
 
-// fetchJWKS fetches the JWKS from Clerk
-func (m *ClerkMiddleware) fetchJWKS() (*JWKS, error) {
-	m.jwksMu.RLock()
-	if m.jwks != nil && time.Since(m.jwksCache) < time.Hour {
-		defer m.jwksMu.RUnlock()
-		return m.jwks, nil
-	}
-	m.jwksMu.RUnlock()
-
-	m.jwksMu.Lock()
-	defer m.jwksMu.Unlock()
-
-	resp, err := http.Get(m.config.JWKSURL)
-	if err != nil {
-		return nil, fmt.Errorf("failed to fetch JWKS: %w", err)
-	}
-	defer resp.Body.Close()
-
-	var jwks JWKS
-	if err := json.NewDecoder(resp.Body).Decode(&jwks); err != nil {
-		return nil, fmt.Errorf("failed to decode JWKS: %w", err)
-	}
-
-	m.jwks = &jwks
-	m.jwksCache = time.Now()
-	return &jwks, nil
+// getJWK returns the cached JWK
+func (m *ClerkMiddleware) getJWK() *clerk.JSONWebKey {
+	m.jwkMu.RLock()
+	defer m.jwkMu.RUnlock()
+	return m.jwkStore.jwk
 }
 
-// getPublicKey extracts the RSA public key from a JWK
-func getPublicKey(jwk JWK) (*rsa.PublicKey, error) {
-	nBytes, err := base64.RawURLEncoding.DecodeString(jwk.N)
-	if err != nil {
-		return nil, fmt.Errorf("failed to decode N: %w", err)
-	}
-
-	eBytes, err := base64.RawURLEncoding.DecodeString(jwk.E)
-	if err != nil {
-		return nil, fmt.Errorf("failed to decode E: %w", err)
-	}
-
-	e := 0
-	for _, b := range eBytes {
-		e = e<<8 + int(b)
-	}
-
-	return &rsa.PublicKey{
-		N: new(big.Int).SetBytes(nBytes),
-		E: e,
-	}, nil
+// setJWK caches the JWK
+func (m *ClerkMiddleware) setJWK(jwk *clerk.JSONWebKey) {
+	m.jwkMu.Lock()
+	defer m.jwkMu.Unlock()
+	m.jwkStore.jwk = jwk
 }
 
 // GetUserID extracts user ID from context

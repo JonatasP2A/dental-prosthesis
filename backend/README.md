@@ -55,15 +55,15 @@ server:
   host: "0.0.0.0"
 
 clerk:
-  jwks_url: "https://your-clerk-domain.clerk.accounts.dev/.well-known/jwks.json"
   secret_key: "sk_test_your_secret_key"
 ```
 
 Or use environment variables:
 ```bash
-export CLERK_JWKS_URL="https://your-clerk-domain.clerk.accounts.dev/.well-known/jwks.json"
 export CLERK_SECRET_KEY="sk_test_your_secret_key"
 ```
+
+Note: The Clerk SDK automatically fetches JWKS (JSON Web Key Set) using the secret key, so `jwks_url` is no longer needed.
 
 ### Run Locally
 

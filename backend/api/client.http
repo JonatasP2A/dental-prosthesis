@@ -5,8 +5,13 @@
 @apiVersion = v1
 @contentType = application/json
 
-# Replace with your Clerk JWT token
-@authToken = your-clerk-jwt-token-here
+# Replace with your Clerk JWT session token (NOT a secret key!)
+# To get a JWT token:
+# 1. Sign in to your frontend application
+# 2. Extract the session token from the Authorization header or __session cookie
+# 3. The token should start with "eyJ" (base64 encoded JWT)
+# Secret keys (starting with "sk_") are for backend API calls, not JWT authentication
+@authToken = your-jwt-session-token-here
 
 
 ### ===========================================
@@ -63,7 +68,7 @@ Authorization: Bearer {{authToken}}
 
 ### Get Laboratory by ID
 # Replace {id} with actual laboratory ID from create response
-@laboratoryId = your-laboratory-id-here
+@laboratoryId = e7ab01cf-ae0d-4a12-b822-640a3dff18ef
 
 GET {{baseUrl}}/api/{{apiVersion}}/laboratories/{{laboratoryId}}
 Authorization: Bearer {{authToken}}

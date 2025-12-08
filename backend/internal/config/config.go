@@ -18,7 +18,6 @@ type ServerConfig struct {
 
 // ClerkConfig holds Clerk authentication configuration
 type ClerkConfig struct {
-	JWKSURL   string `mapstructure:"jwks_url"`
 	SecretKey string `mapstructure:"secret_key"`
 }
 
@@ -33,7 +32,6 @@ func Load() (*Config, error) {
 	// Set defaults
 	viper.SetDefault("server.port", "8080")
 	viper.SetDefault("server.host", "0.0.0.0")
-	viper.SetDefault("clerk.jwks_url", "")
 	viper.SetDefault("clerk.secret_key", "")
 
 	// Environment variables
@@ -43,7 +41,6 @@ func Load() (*Config, error) {
 	// Bind specific environment variables
 	_ = viper.BindEnv("server.port", "DENTAL_SERVER_PORT")
 	_ = viper.BindEnv("server.host", "DENTAL_SERVER_HOST")
-	_ = viper.BindEnv("clerk.jwks_url", "CLERK_JWKS_URL")
 	_ = viper.BindEnv("clerk.secret_key", "CLERK_SECRET_KEY")
 
 	// Try to read config file (optional)
