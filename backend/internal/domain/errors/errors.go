@@ -21,6 +21,9 @@ var (
 
 	// ErrInternal indicates an internal server error
 	ErrInternal = errors.New("internal error")
+
+	// ErrInvalidStatusTransition indicates an invalid order status transition
+	ErrInvalidStatusTransition = errors.New("invalid status transition")
 )
 
 // ValidationError represents a field validation error

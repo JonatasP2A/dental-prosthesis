@@ -171,3 +171,285 @@ Authorization: Bearer {{authToken}}
 ### List Laboratories without auth (should return 401 when auth is enabled)
 GET {{baseUrl}}/api/{{apiVersion}}/laboratories
 
+
+### ===========================================
+### Client Endpoints
+### ===========================================
+
+# Note: Client operations require a valid JWT token with laboratory_id claim
+# All clients are scoped to the authenticated user's laboratory
+
+### Create Client
+POST {{baseUrl}}/api/{{apiVersion}}/clients
+Content-Type: {{contentType}}
+Authorization: Bearer {{authToken}}
+
+{
+  "name": "Dr. João Silva",
+  "email": "joao.silva@clinicadental.com",
+  "phone": "+5511999999888",
+  "address": {
+    "street": "Av. Paulista, 1000",
+    "city": "São Paulo",
+    "state": "SP",
+    "postal_code": "01310-100",
+    "country": "Brazil"
+  }
+}
+
+### Create Client - Second Client
+POST {{baseUrl}}/api/{{apiVersion}}/clients
+Content-Type: {{contentType}}
+Authorization: Bearer {{authToken}}
+
+{
+  "name": "Dra. Maria Santos",
+  "email": "maria.santos@odontoclinic.com",
+  "phone": "+5511988887777",
+  "address": {
+    "street": "Rua Oscar Freire, 500",
+    "city": "São Paulo",
+    "state": "SP",
+    "postal_code": "01426-001",
+    "country": "Brazil"
+  }
+}
+
+### List All Clients (laboratory-scoped)
+GET {{baseUrl}}/api/{{apiVersion}}/clients
+Authorization: Bearer {{authToken}}
+
+### Get Client by ID
+# Replace with actual client ID from create response
+@clientId = your-client-id-here
+
+GET {{baseUrl}}/api/{{apiVersion}}/clients/{{clientId}}
+Authorization: Bearer {{authToken}}
+
+### Update Client
+PUT {{baseUrl}}/api/{{apiVersion}}/clients/{{clientId}}
+Content-Type: {{contentType}}
+Authorization: Bearer {{authToken}}
+
+{
+  "name": "Dr. João Silva - Updated",
+  "email": "joao.silva.updated@clinicadental.com",
+  "phone": "+5511999999777",
+  "address": {
+    "street": "Av. Paulista, 1500 - Sala 100",
+    "city": "São Paulo",
+    "state": "SP",
+    "postal_code": "01310-200",
+    "country": "Brazil"
+  }
+}
+
+### Delete Client (Soft Delete)
+DELETE {{baseUrl}}/api/{{apiVersion}}/clients/{{clientId}}
+Authorization: Bearer {{authToken}}
+
+
+### ===========================================
+### Order Endpoints
+### ===========================================
+
+# Note: Order operations require a valid JWT token with laboratory_id claim
+# All orders are scoped to the authenticated user's laboratory
+# Orders must reference a valid client that belongs to the same laboratory
+
+### Create Order
+# Replace clientId with actual client ID from create client response
+POST {{baseUrl}}/api/{{apiVersion}}/orders
+Content-Type: {{contentType}}
+Authorization: Bearer {{authToken}}
+
+{
+  "client_id": "{{clientId}}",
+  "prosthesis": [
+    {
+      "type": "crown",
+      "material": "zirconia",
+      "shade": "A2",
+      "quantity": 2,
+      "notes": "Upper molars 16 and 17"
+    },
+    {
+      "type": "bridge",
+      "material": "porcelain",
+      "shade": "A3",
+      "quantity": 1,
+      "notes": "Lower anterior bridge 31-41"
+    }
+  ]
+}
+
+### Create Order - Second Order
+POST {{baseUrl}}/api/{{apiVersion}}/orders
+Content-Type: {{contentType}}
+Authorization: Bearer {{authToken}}
+
+{
+  "client_id": "{{clientId}}",
+  "prosthesis": [
+    {
+      "type": "veneer",
+      "material": "porcelain",
+      "shade": "B1",
+      "quantity": 6,
+      "notes": "Upper anterior teeth 13-23"
+    }
+  ]
+}
+
+### List All Orders (laboratory-scoped)
+GET {{baseUrl}}/api/{{apiVersion}}/orders
+Authorization: Bearer {{authToken}}
+
+### Get Order by ID
+# Replace with actual order ID from create response
+@orderId = your-order-id-here
+
+GET {{baseUrl}}/api/{{apiVersion}}/orders/{{orderId}}
+Authorization: Bearer {{authToken}}
+
+### Update Order (prosthesis items only)
+PUT {{baseUrl}}/api/{{apiVersion}}/orders/{{orderId}}
+Content-Type: {{contentType}}
+Authorization: Bearer {{authToken}}
+
+{
+  "prosthesis": [
+    {
+      "type": "crown",
+      "material": "zirconia",
+      "shade": "A2",
+      "quantity": 3,
+      "notes": "Upper molars 16, 17, and 26 - Updated"
+    }
+  ]
+}
+
+### Update Order Status - Start Production
+# Status workflow: received → in_production → quality_check → ready → delivered/revision
+# revision → in_production (allows rework cycle)
+PATCH {{baseUrl}}/api/{{apiVersion}}/orders/{{orderId}}/status
+Content-Type: {{contentType}}
+Authorization: Bearer {{authToken}}
+
+{
+  "status": "in_production"
+}
+
+### Update Order Status - Quality Check
+PATCH {{baseUrl}}/api/{{apiVersion}}/orders/{{orderId}}/status
+Content-Type: {{contentType}}
+Authorization: Bearer {{authToken}}
+
+{
+  "status": "quality_check"
+}
+
+### Update Order Status - Ready
+PATCH {{baseUrl}}/api/{{apiVersion}}/orders/{{orderId}}/status
+Content-Type: {{contentType}}
+Authorization: Bearer {{authToken}}
+
+{
+  "status": "ready"
+}
+
+### Update Order Status - Delivered
+PATCH {{baseUrl}}/api/{{apiVersion}}/orders/{{orderId}}/status
+Content-Type: {{contentType}}
+Authorization: Bearer {{authToken}}
+
+{
+  "status": "delivered"
+}
+
+### Update Order Status - Revision (from ready state)
+# Note: First set status to "ready", then this will work
+PATCH {{baseUrl}}/api/{{apiVersion}}/orders/{{orderId}}/status
+Content-Type: {{contentType}}
+Authorization: Bearer {{authToken}}
+
+{
+  "status": "revision"
+}
+
+### List Orders by Client
+# Uses the same :id parameter as other client routes
+GET {{baseUrl}}/api/{{apiVersion}}/clients/{{clientId}}/orders
+Authorization: Bearer {{authToken}}
+
+### Delete Order (Soft Delete)
+DELETE {{baseUrl}}/api/{{apiVersion}}/orders/{{orderId}}
+Authorization: Bearer {{authToken}}
+
+
+### ===========================================
+### Client Error Cases - For Testing
+### ===========================================
+
+### Create Client - Missing Required Fields (should return 400)
+POST {{baseUrl}}/api/{{apiVersion}}/clients
+Content-Type: {{contentType}}
+Authorization: Bearer {{authToken}}
+
+{
+  "name": "",
+  "email": "invalid-email",
+  "phone": "",
+  "address": {}
+}
+
+### Get Non-existent Client (should return 404)
+GET {{baseUrl}}/api/{{apiVersion}}/clients/non-existent-id
+Authorization: Bearer {{authToken}}
+
+
+### ===========================================
+### Order Error Cases - For Testing
+### ===========================================
+
+### Create Order - Missing Client ID (should return 400)
+POST {{baseUrl}}/api/{{apiVersion}}/orders
+Content-Type: {{contentType}}
+Authorization: Bearer {{authToken}}
+
+{
+  "client_id": "",
+  "prosthesis": []
+}
+
+### Create Order - Non-existent Client (should return 404)
+POST {{baseUrl}}/api/{{apiVersion}}/orders
+Content-Type: {{contentType}}
+Authorization: Bearer {{authToken}}
+
+{
+  "client_id": "non-existent-client-id",
+  "prosthesis": [
+    {
+      "type": "crown",
+      "material": "zirconia",
+      "shade": "A2",
+      "quantity": 1
+    }
+  ]
+}
+
+### Update Order Status - Invalid Transition (should return 400)
+# Trying to go from "received" directly to "delivered" is invalid
+PATCH {{baseUrl}}/api/{{apiVersion}}/orders/{{orderId}}/status
+Content-Type: {{contentType}}
+Authorization: Bearer {{authToken}}
+
+{
+  "status": "delivered"
+}
+
+### Get Non-existent Order (should return 404)
+GET {{baseUrl}}/api/{{apiVersion}}/orders/non-existent-id
+Authorization: Bearer {{authToken}}
+
