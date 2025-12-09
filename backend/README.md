@@ -11,9 +11,9 @@ backend/
 │   ├── domain/          # Core business logic (entities, value objects)
 │   │   ├── errors/      # Domain errors
 │   │   ├── laboratory/  # Laboratory domain
-│   │   ├── order/       # Order domain (planned)
-│   │   ├── client/      # Client domain (planned)
-│   │   ├── prosthesis/  # Prosthesis domain (planned)
+│   │   ├── order/       # Order domain
+│   │   ├── client/       # Client domain
+│   │   ├── prosthesis/  # Prosthesis domain
 │   │   └── technician/  # Technician domain (planned)
 │   ├── ports/           # Interface definitions
 │   │   ├── inbound/     # Use case interfaces (driving)
@@ -28,7 +28,10 @@ backend/
 │   │       └── persistence/
 │   │           └── memory/   # In-memory repository
 │   ├── application/     # Use cases / application services
-│   │   └── laboratory/  # Laboratory use cases
+│   │   ├── laboratory/  # Laboratory use cases
+│   │   ├── client/      # Client use cases
+│   │   ├── order/       # Order use cases
+│   │   └── prosthesis/ # Prosthesis use cases
 │   └── config/          # Viper configuration
 ├── pkg/                 # Shared packages
 │   ├── auth/            # Clerk authentication
@@ -113,6 +116,17 @@ DELETE /api/v1/orders/:id?laboratory_id=xxx        # Delete order (soft delete)
 GET    /api/v1/clients/:id/orders?laboratory_id=xxx # List orders by client
 ```
 
+#### Prostheses
+```
+POST   /api/v1/prostheses?laboratory_id=xxx     # Create prosthesis
+GET    /api/v1/prostheses?laboratory_id=xxx     # List prostheses
+GET    /api/v1/prostheses?laboratory_id=xxx&type=crown # List prostheses filtered by type
+GET    /api/v1/prostheses?laboratory_id=xxx&material=zirconia # List prostheses filtered by material
+GET    /api/v1/prostheses/:id?laboratory_id=xxx # Get prosthesis by ID
+PUT    /api/v1/prostheses/:id?laboratory_id=xxx # Update prosthesis
+DELETE /api/v1/prostheses/:id?laboratory_id=xxx # Delete prosthesis (soft delete)
+```
+
 #### Example: Create Laboratory
 ```bash
 curl -X POST http://localhost:8080/api/v1/laboratories \
@@ -154,6 +168,35 @@ curl -X POST "http://localhost:8080/api/v1/clients?laboratory_id=lab-123" \
 #### Example: List Clients (requires laboratory_id query parameter)
 ```bash
 curl -X GET "http://localhost:8080/api/v1/clients?laboratory_id=lab-123" \
+  -H "Authorization: Bearer <your-clerk-jwt>"
+```
+
+#### Example: Create Prosthesis (requires laboratory_id query parameter)
+```bash
+curl -X POST "http://localhost:8080/api/v1/prostheses?laboratory_id=lab-123" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <your-clerk-jwt>" \
+  -d '{
+    "type": "crown",
+    "material": "zirconia",
+    "shade": "A1",
+    "specifications": "Full coverage crown",
+    "notes": "High priority case"
+  }'
+```
+
+#### Example: List Prostheses (requires laboratory_id query parameter)
+```bash
+# List all prostheses
+curl -X GET "http://localhost:8080/api/v1/prostheses?laboratory_id=lab-123" \
+  -H "Authorization: Bearer <your-clerk-jwt>"
+
+# List prostheses filtered by type
+curl -X GET "http://localhost:8080/api/v1/prostheses?laboratory_id=lab-123&type=crown" \
+  -H "Authorization: Bearer <your-clerk-jwt>"
+
+# List prostheses filtered by material
+curl -X GET "http://localhost:8080/api/v1/prostheses?laboratory_id=lab-123&material=zirconia" \
   -H "Authorization: Bearer <your-clerk-jwt>"
 ```
 
@@ -237,6 +280,7 @@ The middleware expects the following claims:
 
 - **Client endpoints**: All client operations require `?laboratory_id=xxx`
 - **Order endpoints**: All order operations require `?laboratory_id=xxx`
+- **Prosthesis endpoints**: All prosthesis operations require `?laboratory_id=xxx`
 - **Laboratory endpoints**: Laboratory endpoints do not require `laboratory_id` query parameter
 
 **Example:**
@@ -257,3 +301,41 @@ Content-Type: application/json
 ```
 
 If `laboratory_id` query parameter is missing, the API will return HTTP 400 Bad Request.
+
+## Domain: Prosthesis
+
+The Prosthesis domain represents individual dental prosthetic items (crowns, bridges, dentures, implants, etc.) that can be tracked independently from orders.
+
+### Entity Fields
+- `ID` - Unique identifier
+- `LaboratoryID` - Laboratory identifier (required)
+- `Type` - Prosthesis type (required, enum: crown, bridge, complete_denture, partial_denture, implant, veneer, inlay, onlay)
+- `Material` - Material used (required, e.g., zirconia, porcelain, metal alloy, acrylic)
+- `Shade` - Tooth color matching (optional, e.g., A1, A2, B1 using VITA scale)
+- `Specifications` - Technical details (optional)
+- `Notes` - Special instructions (optional)
+- `CreatedAt` - Creation timestamp (UTC)
+- `UpdatedAt` - Last update timestamp (UTC)
+- `DeletedAt` - Soft delete timestamp (nullable)
+
+### Prosthesis Types
+- `crown` - Crown (coroa)
+- `bridge` - Bridge (ponte)
+- `complete_denture` - Complete denture (prótese total)
+- `partial_denture` - Partial denture (prótese parcial)
+- `implant` - Implant-supported prosthetic
+- `veneer` - Veneer (faceta)
+- `inlay` - Inlay
+- `onlay` - Onlay
+
+### Use Cases
+- **CreateProsthesis**: Creates a new prosthesis with validation
+- **GetProsthesis**: Retrieves a prosthesis by ID (laboratory-scoped)
+- **UpdateProsthesis**: Updates prosthesis information
+- **ListProstheses**: Lists all active prostheses for a laboratory, optionally filtered by type or material
+- **DeleteProsthesis**: Soft deletes a prosthesis
+
+### Filtering
+The ListProstheses endpoint supports optional query parameters:
+- `type` - Filter by prosthesis type (e.g., `?type=crown`)
+- `material` - Filter by material (e.g., `?material=zirconia`)
