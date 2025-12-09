@@ -13,6 +13,10 @@
 # Secret keys (starting with "sk_") are for backend API calls, not JWT authentication
 @authToken = your-jwt-session-token-here
 
+# BREAKING CHANGE: laboratory_id is now required as a query parameter
+# Replace with your laboratory ID
+@laboratoryId = your-laboratory-id-here
+
 
 ### ===========================================
 ### Health Check
@@ -176,11 +180,14 @@ GET {{baseUrl}}/api/{{apiVersion}}/laboratories
 ### Client Endpoints
 ### ===========================================
 
-# Note: Client operations require a valid JWT token with laboratory_id claim
-# All clients are scoped to the authenticated user's laboratory
+# Note: Client operations require a valid JWT token AND laboratory_id query parameter
+# All clients are scoped to the laboratory_id provided in the query parameter
+# BREAKING CHANGE: laboratory_id must be provided as query parameter, not in JWT
+
+@laboratoryId = your-laboratory-id-here
 
 ### Create Client
-POST {{baseUrl}}/api/{{apiVersion}}/clients
+POST {{baseUrl}}/api/{{apiVersion}}/clients?laboratory_id={{laboratoryId}}
 Content-Type: {{contentType}}
 Authorization: Bearer {{authToken}}
 
@@ -198,7 +205,7 @@ Authorization: Bearer {{authToken}}
 }
 
 ### Create Client - Second Client
-POST {{baseUrl}}/api/{{apiVersion}}/clients
+POST {{baseUrl}}/api/{{apiVersion}}/clients?laboratory_id={{laboratoryId}}
 Content-Type: {{contentType}}
 Authorization: Bearer {{authToken}}
 
@@ -216,18 +223,18 @@ Authorization: Bearer {{authToken}}
 }
 
 ### List All Clients (laboratory-scoped)
-GET {{baseUrl}}/api/{{apiVersion}}/clients
+GET {{baseUrl}}/api/{{apiVersion}}/clients?laboratory_id={{laboratoryId}}
 Authorization: Bearer {{authToken}}
 
 ### Get Client by ID
 # Replace with actual client ID from create response
 @clientId = your-client-id-here
 
-GET {{baseUrl}}/api/{{apiVersion}}/clients/{{clientId}}
+GET {{baseUrl}}/api/{{apiVersion}}/clients/{{clientId}}?laboratory_id={{laboratoryId}}
 Authorization: Bearer {{authToken}}
 
 ### Update Client
-PUT {{baseUrl}}/api/{{apiVersion}}/clients/{{clientId}}
+PUT {{baseUrl}}/api/{{apiVersion}}/clients/{{clientId}}?laboratory_id={{laboratoryId}}
 Content-Type: {{contentType}}
 Authorization: Bearer {{authToken}}
 
@@ -245,7 +252,7 @@ Authorization: Bearer {{authToken}}
 }
 
 ### Delete Client (Soft Delete)
-DELETE {{baseUrl}}/api/{{apiVersion}}/clients/{{clientId}}
+DELETE {{baseUrl}}/api/{{apiVersion}}/clients/{{clientId}}?laboratory_id={{laboratoryId}}
 Authorization: Bearer {{authToken}}
 
 
@@ -253,13 +260,14 @@ Authorization: Bearer {{authToken}}
 ### Order Endpoints
 ### ===========================================
 
-# Note: Order operations require a valid JWT token with laboratory_id claim
-# All orders are scoped to the authenticated user's laboratory
+# Note: Order operations require a valid JWT token AND laboratory_id query parameter
+# All orders are scoped to the laboratory_id provided in the query parameter
 # Orders must reference a valid client that belongs to the same laboratory
+# BREAKING CHANGE: laboratory_id must be provided as query parameter, not in JWT
 
 ### Create Order
 # Replace clientId with actual client ID from create client response
-POST {{baseUrl}}/api/{{apiVersion}}/orders
+POST {{baseUrl}}/api/{{apiVersion}}/orders?laboratory_id={{laboratoryId}}
 Content-Type: {{contentType}}
 Authorization: Bearer {{authToken}}
 
@@ -284,7 +292,7 @@ Authorization: Bearer {{authToken}}
 }
 
 ### Create Order - Second Order
-POST {{baseUrl}}/api/{{apiVersion}}/orders
+POST {{baseUrl}}/api/{{apiVersion}}/orders?laboratory_id={{laboratoryId}}
 Content-Type: {{contentType}}
 Authorization: Bearer {{authToken}}
 
@@ -302,18 +310,18 @@ Authorization: Bearer {{authToken}}
 }
 
 ### List All Orders (laboratory-scoped)
-GET {{baseUrl}}/api/{{apiVersion}}/orders
+GET {{baseUrl}}/api/{{apiVersion}}/orders?laboratory_id={{laboratoryId}}
 Authorization: Bearer {{authToken}}
 
 ### Get Order by ID
 # Replace with actual order ID from create response
 @orderId = your-order-id-here
 
-GET {{baseUrl}}/api/{{apiVersion}}/orders/{{orderId}}
+GET {{baseUrl}}/api/{{apiVersion}}/orders/{{orderId}}?laboratory_id={{laboratoryId}}
 Authorization: Bearer {{authToken}}
 
 ### Update Order (prosthesis items only)
-PUT {{baseUrl}}/api/{{apiVersion}}/orders/{{orderId}}
+PUT {{baseUrl}}/api/{{apiVersion}}/orders/{{orderId}}?laboratory_id={{laboratoryId}}
 Content-Type: {{contentType}}
 Authorization: Bearer {{authToken}}
 
@@ -332,7 +340,7 @@ Authorization: Bearer {{authToken}}
 ### Update Order Status - Start Production
 # Status workflow: received → in_production → quality_check → ready → delivered/revision
 # revision → in_production (allows rework cycle)
-PATCH {{baseUrl}}/api/{{apiVersion}}/orders/{{orderId}}/status
+PATCH {{baseUrl}}/api/{{apiVersion}}/orders/{{orderId}}/status?laboratory_id={{laboratoryId}}
 Content-Type: {{contentType}}
 Authorization: Bearer {{authToken}}
 
@@ -341,7 +349,7 @@ Authorization: Bearer {{authToken}}
 }
 
 ### Update Order Status - Quality Check
-PATCH {{baseUrl}}/api/{{apiVersion}}/orders/{{orderId}}/status
+PATCH {{baseUrl}}/api/{{apiVersion}}/orders/{{orderId}}/status?laboratory_id={{laboratoryId}}
 Content-Type: {{contentType}}
 Authorization: Bearer {{authToken}}
 
@@ -350,7 +358,7 @@ Authorization: Bearer {{authToken}}
 }
 
 ### Update Order Status - Ready
-PATCH {{baseUrl}}/api/{{apiVersion}}/orders/{{orderId}}/status
+PATCH {{baseUrl}}/api/{{apiVersion}}/orders/{{orderId}}/status?laboratory_id={{laboratoryId}}
 Content-Type: {{contentType}}
 Authorization: Bearer {{authToken}}
 
@@ -359,7 +367,7 @@ Authorization: Bearer {{authToken}}
 }
 
 ### Update Order Status - Delivered
-PATCH {{baseUrl}}/api/{{apiVersion}}/orders/{{orderId}}/status
+PATCH {{baseUrl}}/api/{{apiVersion}}/orders/{{orderId}}/status?laboratory_id={{laboratoryId}}
 Content-Type: {{contentType}}
 Authorization: Bearer {{authToken}}
 
@@ -369,7 +377,7 @@ Authorization: Bearer {{authToken}}
 
 ### Update Order Status - Revision (from ready state)
 # Note: First set status to "ready", then this will work
-PATCH {{baseUrl}}/api/{{apiVersion}}/orders/{{orderId}}/status
+PATCH {{baseUrl}}/api/{{apiVersion}}/orders/{{orderId}}/status?laboratory_id={{laboratoryId}}
 Content-Type: {{contentType}}
 Authorization: Bearer {{authToken}}
 
@@ -379,11 +387,11 @@ Authorization: Bearer {{authToken}}
 
 ### List Orders by Client
 # Uses the same :id parameter as other client routes
-GET {{baseUrl}}/api/{{apiVersion}}/clients/{{clientId}}/orders
+GET {{baseUrl}}/api/{{apiVersion}}/clients/{{clientId}}/orders?laboratory_id={{laboratoryId}}
 Authorization: Bearer {{authToken}}
 
 ### Delete Order (Soft Delete)
-DELETE {{baseUrl}}/api/{{apiVersion}}/orders/{{orderId}}
+DELETE {{baseUrl}}/api/{{apiVersion}}/orders/{{orderId}}?laboratory_id={{laboratoryId}}
 Authorization: Bearer {{authToken}}
 
 
@@ -391,8 +399,26 @@ Authorization: Bearer {{authToken}}
 ### Client Error Cases - For Testing
 ### ===========================================
 
-### Create Client - Missing Required Fields (should return 400)
+### Create Client - Missing laboratory_id Query Parameter (should return 400)
 POST {{baseUrl}}/api/{{apiVersion}}/clients
+Content-Type: {{contentType}}
+Authorization: Bearer {{authToken}}
+
+{
+  "name": "Test Client",
+  "email": "test@example.com",
+  "phone": "+5511999999999",
+  "address": {
+    "street": "Test Street",
+    "city": "Test City",
+    "state": "SP",
+    "postal_code": "01234-567",
+    "country": "Brazil"
+  }
+}
+
+### Create Client - Missing Required Fields (should return 400)
+POST {{baseUrl}}/api/{{apiVersion}}/clients?laboratory_id={{laboratoryId}}
 Content-Type: {{contentType}}
 Authorization: Bearer {{authToken}}
 
@@ -404,7 +430,7 @@ Authorization: Bearer {{authToken}}
 }
 
 ### Get Non-existent Client (should return 404)
-GET {{baseUrl}}/api/{{apiVersion}}/clients/non-existent-id
+GET {{baseUrl}}/api/{{apiVersion}}/clients/non-existent-id?laboratory_id={{laboratoryId}}
 Authorization: Bearer {{authToken}}
 
 
@@ -412,8 +438,24 @@ Authorization: Bearer {{authToken}}
 ### Order Error Cases - For Testing
 ### ===========================================
 
-### Create Order - Missing Client ID (should return 400)
+### Create Order - Missing laboratory_id Query Parameter (should return 400)
 POST {{baseUrl}}/api/{{apiVersion}}/orders
+Content-Type: {{contentType}}
+Authorization: Bearer {{authToken}}
+
+{
+  "client_id": "{{clientId}}",
+  "prosthesis": [
+    {
+      "type": "crown",
+      "material": "zirconia",
+      "quantity": 1
+    }
+  ]
+}
+
+### Create Order - Missing Client ID (should return 400)
+POST {{baseUrl}}/api/{{apiVersion}}/orders?laboratory_id={{laboratoryId}}
 Content-Type: {{contentType}}
 Authorization: Bearer {{authToken}}
 
@@ -423,7 +465,7 @@ Authorization: Bearer {{authToken}}
 }
 
 ### Create Order - Non-existent Client (should return 404)
-POST {{baseUrl}}/api/{{apiVersion}}/orders
+POST {{baseUrl}}/api/{{apiVersion}}/orders?laboratory_id={{laboratoryId}}
 Content-Type: {{contentType}}
 Authorization: Bearer {{authToken}}
 
@@ -441,7 +483,7 @@ Authorization: Bearer {{authToken}}
 
 ### Update Order Status - Invalid Transition (should return 400)
 # Trying to go from "received" directly to "delivered" is invalid
-PATCH {{baseUrl}}/api/{{apiVersion}}/orders/{{orderId}}/status
+PATCH {{baseUrl}}/api/{{apiVersion}}/orders/{{orderId}}/status?laboratory_id={{laboratoryId}}
 Content-Type: {{contentType}}
 Authorization: Bearer {{authToken}}
 
@@ -450,6 +492,6 @@ Authorization: Bearer {{authToken}}
 }
 
 ### Get Non-existent Order (should return 404)
-GET {{baseUrl}}/api/{{apiVersion}}/orders/non-existent-id
+GET {{baseUrl}}/api/{{apiVersion}}/orders/non-existent-id?laboratory_id={{laboratoryId}}
 Authorization: Bearer {{authToken}}
 

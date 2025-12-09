@@ -2,10 +2,10 @@ package handler
 
 import (
 	"bytes"
-	"context"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 	"time"
 
@@ -17,7 +17,6 @@ import (
 	"github.com/JonatasP2A/dental-prosthesis/backend/internal/domain/client"
 	"github.com/JonatasP2A/dental-prosthesis/backend/internal/domain/laboratory"
 	ord "github.com/JonatasP2A/dental-prosthesis/backend/internal/domain/order"
-	"github.com/JonatasP2A/dental-prosthesis/backend/pkg/auth"
 )
 
 // mockOrderIDGenerator is a mock ID generator for testing
@@ -110,9 +109,16 @@ func createTestOrder(repo *memory.OrderRepository, id, clientID, laboratoryID st
 	_ = repo.Create(nil, o)
 }
 
-func setLaboratoryIDInContextForOrder(req *http.Request, laboratoryID string) *http.Request {
-	ctx := context.WithValue(req.Context(), auth.LaboratoryIDKey, laboratoryID)
-	return req.WithContext(ctx)
+// addLaboratoryIDQueryParamForOrder adds laboratory_id query parameter to request URL
+func addLaboratoryIDQueryParamForOrder(url string, laboratoryID string) string {
+	if laboratoryID == "" {
+		return url
+	}
+	separator := "?"
+	if strings.Contains(url, "?") {
+		separator = "&"
+	}
+	return url + separator + "laboratory_id=" + laboratoryID
 }
 
 func TestOrderHandler_Create_Success(t *testing.T) {
@@ -134,9 +140,9 @@ func TestOrderHandler_Create_Success(t *testing.T) {
 	}
 
 	body, _ := json.Marshal(reqBody)
-	req := httptest.NewRequest(http.MethodPost, "/orders", bytes.NewReader(body))
+	url := addLaboratoryIDQueryParamForOrder("/orders", "lab-123")
+	req := httptest.NewRequest(http.MethodPost, url, bytes.NewReader(body))
 	req.Header.Set("Content-Type", "application/json")
-	req = setLaboratoryIDInContextForOrder(req, "lab-123")
 
 	rec := httptest.NewRecorder()
 	router.ServeHTTP(rec, req)
@@ -175,7 +181,7 @@ func TestOrderHandler_Create_MissingLaboratoryID(t *testing.T) {
 	body, _ := json.Marshal(reqBody)
 	req := httptest.NewRequest(http.MethodPost, "/orders", bytes.NewReader(body))
 	req.Header.Set("Content-Type", "application/json")
-	// No laboratory ID in context
+	// No laboratory_id query parameter
 
 	rec := httptest.NewRecorder()
 	router.ServeHTTP(rec, req)
@@ -190,9 +196,9 @@ func TestOrderHandler_Create_InvalidBody(t *testing.T) {
 	createTestLaboratoryForOrder(labRepo, "lab-123")
 	createTestClientForOrder(clientRepo, "client-123", "lab-123")
 
-	req := httptest.NewRequest(http.MethodPost, "/orders", bytes.NewReader([]byte("invalid json")))
+	url := addLaboratoryIDQueryParamForOrder("/orders", "lab-123")
+	req := httptest.NewRequest(http.MethodPost, url, bytes.NewReader([]byte("invalid json")))
 	req.Header.Set("Content-Type", "application/json")
-	req = setLaboratoryIDInContextForOrder(req, "lab-123")
 
 	rec := httptest.NewRecorder()
 	router.ServeHTTP(rec, req)
@@ -208,8 +214,8 @@ func TestOrderHandler_Get_Success(t *testing.T) {
 	createTestClientForOrder(clientRepo, "client-123", "lab-123")
 	createTestOrder(orderRepo, "order-123", "client-123", "lab-123")
 
-	req := httptest.NewRequest(http.MethodGet, "/orders/order-123", nil)
-	req = setLaboratoryIDInContextForOrder(req, "lab-123")
+	url := addLaboratoryIDQueryParamForOrder("/orders/order-123", "lab-123")
+	req := httptest.NewRequest(http.MethodGet, url, nil)
 
 	rec := httptest.NewRecorder()
 	router.ServeHTTP(rec, req)
@@ -232,8 +238,8 @@ func TestOrderHandler_Get_NotFound(t *testing.T) {
 	router, _, _, _, labRepo := setupOrderTestRouter()
 	createTestLaboratoryForOrder(labRepo, "lab-123")
 
-	req := httptest.NewRequest(http.MethodGet, "/orders/non-existent", nil)
-	req = setLaboratoryIDInContextForOrder(req, "lab-123")
+	url := addLaboratoryIDQueryParamForOrder("/orders/non-existent", "lab-123")
+	req := httptest.NewRequest(http.MethodGet, url, nil)
 
 	rec := httptest.NewRecorder()
 	router.ServeHTTP(rec, req)
@@ -262,9 +268,9 @@ func TestOrderHandler_Update_Success(t *testing.T) {
 	}
 
 	body, _ := json.Marshal(reqBody)
-	req := httptest.NewRequest(http.MethodPut, "/orders/order-123", bytes.NewReader(body))
+	url := addLaboratoryIDQueryParamForOrder("/orders/order-123", "lab-123")
+	req := httptest.NewRequest(http.MethodPut, url, bytes.NewReader(body))
 	req.Header.Set("Content-Type", "application/json")
-	req = setLaboratoryIDInContextForOrder(req, "lab-123")
 
 	rec := httptest.NewRecorder()
 	router.ServeHTTP(rec, req)
@@ -301,9 +307,9 @@ func TestOrderHandler_Update_NotFound(t *testing.T) {
 	}
 
 	body, _ := json.Marshal(reqBody)
-	req := httptest.NewRequest(http.MethodPut, "/orders/non-existent", bytes.NewReader(body))
+	url := addLaboratoryIDQueryParamForOrder("/orders/non-existent", "lab-123")
+	req := httptest.NewRequest(http.MethodPut, url, bytes.NewReader(body))
 	req.Header.Set("Content-Type", "application/json")
-	req = setLaboratoryIDInContextForOrder(req, "lab-123")
 
 	rec := httptest.NewRecorder()
 	router.ServeHTTP(rec, req)
@@ -324,9 +330,9 @@ func TestOrderHandler_UpdateStatus_Success(t *testing.T) {
 	}
 
 	body, _ := json.Marshal(reqBody)
-	req := httptest.NewRequest(http.MethodPatch, "/orders/order-123/status", bytes.NewReader(body))
+	url := addLaboratoryIDQueryParamForOrder("/orders/order-123/status", "lab-123")
+	req := httptest.NewRequest(http.MethodPatch, url, bytes.NewReader(body))
 	req.Header.Set("Content-Type", "application/json")
-	req = setLaboratoryIDInContextForOrder(req, "lab-123")
 
 	rec := httptest.NewRecorder()
 	router.ServeHTTP(rec, req)
@@ -356,9 +362,9 @@ func TestOrderHandler_UpdateStatus_InvalidTransition(t *testing.T) {
 	}
 
 	body, _ := json.Marshal(reqBody)
-	req := httptest.NewRequest(http.MethodPatch, "/orders/order-123/status", bytes.NewReader(body))
+	url := addLaboratoryIDQueryParamForOrder("/orders/order-123/status", "lab-123")
+	req := httptest.NewRequest(http.MethodPatch, url, bytes.NewReader(body))
 	req.Header.Set("Content-Type", "application/json")
-	req = setLaboratoryIDInContextForOrder(req, "lab-123")
 
 	rec := httptest.NewRecorder()
 	router.ServeHTTP(rec, req)
@@ -379,9 +385,9 @@ func TestOrderHandler_UpdateStatus_InvalidStatus(t *testing.T) {
 	}
 
 	body, _ := json.Marshal(reqBody)
-	req := httptest.NewRequest(http.MethodPatch, "/orders/order-123/status", bytes.NewReader(body))
+	url := addLaboratoryIDQueryParamForOrder("/orders/order-123/status", "lab-123")
+	req := httptest.NewRequest(http.MethodPatch, url, bytes.NewReader(body))
 	req.Header.Set("Content-Type", "application/json")
-	req = setLaboratoryIDInContextForOrder(req, "lab-123")
 
 	rec := httptest.NewRecorder()
 	router.ServeHTTP(rec, req)
@@ -415,8 +421,8 @@ func TestOrderHandler_List_Success(t *testing.T) {
 	}
 	_ = orderRepo.Create(nil, o2)
 
-	req := httptest.NewRequest(http.MethodGet, "/orders", nil)
-	req = setLaboratoryIDInContextForOrder(req, "lab-123")
+	url := addLaboratoryIDQueryParamForOrder("/orders", "lab-123")
+	req := httptest.NewRequest(http.MethodGet, url, nil)
 
 	rec := httptest.NewRecorder()
 	router.ServeHTTP(rec, req)
@@ -459,8 +465,8 @@ func TestOrderHandler_ListByClient_Success(t *testing.T) {
 	}
 	_ = orderRepo.Create(nil, o2)
 
-	req := httptest.NewRequest(http.MethodGet, "/clients/client-123/orders", nil)
-	req = setLaboratoryIDInContextForOrder(req, "lab-123")
+	url := addLaboratoryIDQueryParamForOrder("/clients/client-123/orders", "lab-123")
+	req := httptest.NewRequest(http.MethodGet, url, nil)
 
 	rec := httptest.NewRecorder()
 	router.ServeHTTP(rec, req)
@@ -485,8 +491,8 @@ func TestOrderHandler_Delete_Success(t *testing.T) {
 	createTestClientForOrder(clientRepo, "client-123", "lab-123")
 	createTestOrder(orderRepo, "order-123", "client-123", "lab-123")
 
-	req := httptest.NewRequest(http.MethodDelete, "/orders/order-123", nil)
-	req = setLaboratoryIDInContextForOrder(req, "lab-123")
+	url := addLaboratoryIDQueryParamForOrder("/orders/order-123", "lab-123")
+	req := httptest.NewRequest(http.MethodDelete, url, nil)
 
 	rec := httptest.NewRecorder()
 	router.ServeHTTP(rec, req)
@@ -496,8 +502,8 @@ func TestOrderHandler_Delete_Success(t *testing.T) {
 	}
 
 	// Verify it's deleted
-	req = httptest.NewRequest(http.MethodGet, "/orders/order-123", nil)
-	req = setLaboratoryIDInContextForOrder(req, "lab-123")
+	url = addLaboratoryIDQueryParamForOrder("/orders/order-123", "lab-123")
+	req = httptest.NewRequest(http.MethodGet, url, nil)
 	rec = httptest.NewRecorder()
 	router.ServeHTTP(rec, req)
 
@@ -510,8 +516,8 @@ func TestOrderHandler_Delete_NotFound(t *testing.T) {
 	router, _, _, _, labRepo := setupOrderTestRouter()
 	createTestLaboratoryForOrder(labRepo, "lab-123")
 
-	req := httptest.NewRequest(http.MethodDelete, "/orders/non-existent", nil)
-	req = setLaboratoryIDInContextForOrder(req, "lab-123")
+	url := addLaboratoryIDQueryParamForOrder("/orders/non-existent", "lab-123")
+	req := httptest.NewRequest(http.MethodDelete, url, nil)
 
 	rec := httptest.NewRecorder()
 	router.ServeHTTP(rec, req)
@@ -528,9 +534,9 @@ func TestOrderHandler_LaboratoryScopedAccess(t *testing.T) {
 	createTestClientForOrder(clientRepo, "client-123", "lab-123")
 	createTestOrder(orderRepo, "order-123", "client-123", "lab-123")
 
-	// Try to access order from lab-123 using lab-456 context
-	req := httptest.NewRequest(http.MethodGet, "/orders/order-123", nil)
-	req = setLaboratoryIDInContextForOrder(req, "lab-456")
+	// Try to access order from lab-123 using lab-456 query parameter
+	url := addLaboratoryIDQueryParamForOrder("/orders/order-123", "lab-456")
+	req := httptest.NewRequest(http.MethodGet, url, nil)
 
 	rec := httptest.NewRecorder()
 	router.ServeHTTP(rec, req)
@@ -572,9 +578,9 @@ func TestOrderHandler_StatusWorkflowTransitions(t *testing.T) {
 		}
 
 		body, _ := json.Marshal(reqBody)
-		req := httptest.NewRequest(http.MethodPatch, "/orders/order-123/status", bytes.NewReader(body))
+		url := addLaboratoryIDQueryParamForOrder("/orders/order-123/status", "lab-123")
+		req := httptest.NewRequest(http.MethodPatch, url, bytes.NewReader(body))
 		req.Header.Set("Content-Type", "application/json")
-		req = setLaboratoryIDInContextForOrder(req, "lab-123")
 
 		rec := httptest.NewRecorder()
 		router.ServeHTTP(rec, req)

@@ -9,7 +9,6 @@ import (
 	"github.com/JonatasP2A/dental-prosthesis/backend/internal/adapters/inbound/http/dto"
 	clientapp "github.com/JonatasP2A/dental-prosthesis/backend/internal/application/client"
 	domainerrors "github.com/JonatasP2A/dental-prosthesis/backend/internal/domain/errors"
-	"github.com/JonatasP2A/dental-prosthesis/backend/pkg/auth"
 )
 
 // ClientHandler handles HTTP requests for client operations
@@ -22,13 +21,22 @@ func NewClientHandler(service *clientapp.Service) *ClientHandler {
 	return &ClientHandler{service: service}
 }
 
+// getLaboratoryID extracts laboratory_id from query parameter
+func (h *ClientHandler) getLaboratoryID(c *gin.Context) (string, error) {
+	laboratoryID := c.Query("laboratory_id")
+	if laboratoryID == "" {
+		return "", errors.New("laboratory_id query parameter is required")
+	}
+	return laboratoryID, nil
+}
+
 // Create handles POST /api/v1/clients
 func (h *ClientHandler) Create(c *gin.Context) {
-	// Get laboratory ID from JWT claims
-	laboratoryID := auth.GetLaboratoryID(c.Request.Context())
-	if laboratoryID == "" {
+	// Get laboratory ID from query parameter
+	laboratoryID, err := h.getLaboratoryID(c)
+	if err != nil {
 		c.JSON(http.StatusBadRequest, dto.ErrorResponse{
-			Error: "laboratory_id not found in token",
+			Error: err.Error(),
 		})
 		return
 	}
@@ -60,11 +68,11 @@ func (h *ClientHandler) Create(c *gin.Context) {
 
 // Get handles GET /api/v1/clients/:id
 func (h *ClientHandler) Get(c *gin.Context) {
-	// Get laboratory ID from JWT claims
-	laboratoryID := auth.GetLaboratoryID(c.Request.Context())
-	if laboratoryID == "" {
+	// Get laboratory ID from query parameter
+	laboratoryID, err := h.getLaboratoryID(c)
+	if err != nil {
 		c.JSON(http.StatusBadRequest, dto.ErrorResponse{
-			Error: "laboratory_id not found in token",
+			Error: err.Error(),
 		})
 		return
 	}
@@ -88,11 +96,11 @@ func (h *ClientHandler) Get(c *gin.Context) {
 
 // Update handles PUT /api/v1/clients/:id
 func (h *ClientHandler) Update(c *gin.Context) {
-	// Get laboratory ID from JWT claims
-	laboratoryID := auth.GetLaboratoryID(c.Request.Context())
-	if laboratoryID == "" {
+	// Get laboratory ID from query parameter
+	laboratoryID, err := h.getLaboratoryID(c)
+	if err != nil {
 		c.JSON(http.StatusBadRequest, dto.ErrorResponse{
-			Error: "laboratory_id not found in token",
+			Error: err.Error(),
 		})
 		return
 	}
@@ -133,11 +141,11 @@ func (h *ClientHandler) Update(c *gin.Context) {
 
 // List handles GET /api/v1/clients
 func (h *ClientHandler) List(c *gin.Context) {
-	// Get laboratory ID from JWT claims
-	laboratoryID := auth.GetLaboratoryID(c.Request.Context())
-	if laboratoryID == "" {
+	// Get laboratory ID from query parameter
+	laboratoryID, err := h.getLaboratoryID(c)
+	if err != nil {
 		c.JSON(http.StatusBadRequest, dto.ErrorResponse{
-			Error: "laboratory_id not found in token",
+			Error: err.Error(),
 		})
 		return
 	}
@@ -153,11 +161,11 @@ func (h *ClientHandler) List(c *gin.Context) {
 
 // Delete handles DELETE /api/v1/clients/:id
 func (h *ClientHandler) Delete(c *gin.Context) {
-	// Get laboratory ID from JWT claims
-	laboratoryID := auth.GetLaboratoryID(c.Request.Context())
-	if laboratoryID == "" {
+	// Get laboratory ID from query parameter
+	laboratoryID, err := h.getLaboratoryID(c)
+	if err != nil {
 		c.JSON(http.StatusBadRequest, dto.ErrorResponse{
-			Error: "laboratory_id not found in token",
+			Error: err.Error(),
 		})
 		return
 	}
@@ -170,7 +178,7 @@ func (h *ClientHandler) Delete(c *gin.Context) {
 		return
 	}
 
-	err := h.service.DeleteClient(c.Request.Context(), id, laboratoryID)
+	err = h.service.DeleteClient(c.Request.Context(), id, laboratoryID)
 	if err != nil {
 		h.handleError(c, err)
 		return

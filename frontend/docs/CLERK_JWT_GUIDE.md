@@ -139,8 +139,33 @@ Your backend expects the JWT token in this format:
 Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...
 ```
 
+**Important Breaking Change**: The backend no longer extracts `laboratory_id` from JWT tokens. Instead, you must include `laboratory_id` as a query parameter in all API requests that require laboratory context.
+
 The backend will:
 1. Extract the token from the Authorization header
 2. Verify it using Clerk SDK
-3. Extract `laboratory_id` from custom claims
-4. Use it for multi-tenant data isolation
+3. Extract user ID (`sub` claim) from the token
+4. Require `laboratory_id` as a query parameter for client and order endpoints
+
+### Example API Calls
+
+```typescript
+// List clients for a laboratory
+const response = await authenticatedFetch(
+  `/api/v1/clients?laboratory_id=${laboratoryId}`
+);
+
+// Create an order
+const response = await authenticatedFetch(
+  `/api/v1/orders?laboratory_id=${laboratoryId}`,
+  {
+    method: 'POST',
+    body: JSON.stringify({
+      client_id: 'client-123',
+      prosthesis: [...]
+    })
+  }
+);
+```
+
+**Note**: Laboratory endpoints (`/api/v1/laboratories`) do not require the `laboratory_id` query parameter.

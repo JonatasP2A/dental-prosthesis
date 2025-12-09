@@ -2,10 +2,10 @@ package handler
 
 import (
 	"bytes"
-	"context"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 	"time"
 
@@ -16,7 +16,6 @@ import (
 	clientapp "github.com/JonatasP2A/dental-prosthesis/backend/internal/application/client"
 	"github.com/JonatasP2A/dental-prosthesis/backend/internal/domain/client"
 	"github.com/JonatasP2A/dental-prosthesis/backend/internal/domain/laboratory"
-	"github.com/JonatasP2A/dental-prosthesis/backend/pkg/auth"
 )
 
 // mockIDGenerator is a mock ID generator for testing
@@ -86,9 +85,16 @@ func createTestClient(repo *memory.ClientRepository, id, laboratoryID string) {
 	_ = repo.Create(nil, c)
 }
 
-func setLaboratoryIDInContext(req *http.Request, laboratoryID string) *http.Request {
-	ctx := context.WithValue(req.Context(), auth.LaboratoryIDKey, laboratoryID)
-	return req.WithContext(ctx)
+// addLaboratoryIDQueryParam adds laboratory_id query parameter to request URL
+func addLaboratoryIDQueryParam(url string, laboratoryID string) string {
+	if laboratoryID == "" {
+		return url
+	}
+	separator := "?"
+	if strings.Contains(url, "?") {
+		separator = "&"
+	}
+	return url + separator + "laboratory_id=" + laboratoryID
 }
 
 func TestClientHandler_Create_Success(t *testing.T) {
@@ -109,9 +115,9 @@ func TestClientHandler_Create_Success(t *testing.T) {
 	}
 
 	body, _ := json.Marshal(reqBody)
-	req := httptest.NewRequest(http.MethodPost, "/clients", bytes.NewReader(body))
+	url := addLaboratoryIDQueryParam("/clients", "lab-123")
+	req := httptest.NewRequest(http.MethodPost, url, bytes.NewReader(body))
 	req.Header.Set("Content-Type", "application/json")
-	req = setLaboratoryIDInContext(req, "lab-123")
 
 	rec := httptest.NewRecorder()
 	router.ServeHTTP(rec, req)
@@ -149,7 +155,7 @@ func TestClientHandler_Create_MissingLaboratoryID(t *testing.T) {
 	body, _ := json.Marshal(reqBody)
 	req := httptest.NewRequest(http.MethodPost, "/clients", bytes.NewReader(body))
 	req.Header.Set("Content-Type", "application/json")
-	// No laboratory ID in context
+	// No laboratory_id query parameter
 
 	rec := httptest.NewRecorder()
 	router.ServeHTTP(rec, req)
@@ -163,9 +169,9 @@ func TestClientHandler_Create_InvalidBody(t *testing.T) {
 	router, _, _, labRepo := setupTestRouter()
 	createTestLaboratory(labRepo, "lab-123")
 
-	req := httptest.NewRequest(http.MethodPost, "/clients", bytes.NewReader([]byte("invalid json")))
+	url := addLaboratoryIDQueryParam("/clients", "lab-123")
+	req := httptest.NewRequest(http.MethodPost, url, bytes.NewReader([]byte("invalid json")))
 	req.Header.Set("Content-Type", "application/json")
-	req = setLaboratoryIDInContext(req, "lab-123")
 
 	rec := httptest.NewRecorder()
 	router.ServeHTTP(rec, req)
@@ -180,8 +186,8 @@ func TestClientHandler_Get_Success(t *testing.T) {
 	createTestLaboratory(labRepo, "lab-123")
 	createTestClient(clientRepo, "client-123", "lab-123")
 
-	req := httptest.NewRequest(http.MethodGet, "/clients/client-123", nil)
-	req = setLaboratoryIDInContext(req, "lab-123")
+	url := addLaboratoryIDQueryParam("/clients/client-123", "lab-123")
+	req := httptest.NewRequest(http.MethodGet, url, nil)
 
 	rec := httptest.NewRecorder()
 	router.ServeHTTP(rec, req)
@@ -204,8 +210,8 @@ func TestClientHandler_Get_NotFound(t *testing.T) {
 	router, _, _, labRepo := setupTestRouter()
 	createTestLaboratory(labRepo, "lab-123")
 
-	req := httptest.NewRequest(http.MethodGet, "/clients/non-existent", nil)
-	req = setLaboratoryIDInContext(req, "lab-123")
+	url := addLaboratoryIDQueryParam("/clients/non-existent", "lab-123")
+	req := httptest.NewRequest(http.MethodGet, url, nil)
 
 	rec := httptest.NewRecorder()
 	router.ServeHTTP(rec, req)
@@ -234,9 +240,9 @@ func TestClientHandler_Update_Success(t *testing.T) {
 	}
 
 	body, _ := json.Marshal(reqBody)
-	req := httptest.NewRequest(http.MethodPut, "/clients/client-123", bytes.NewReader(body))
+	url := addLaboratoryIDQueryParam("/clients/client-123", "lab-123")
+	req := httptest.NewRequest(http.MethodPut, url, bytes.NewReader(body))
 	req.Header.Set("Content-Type", "application/json")
-	req = setLaboratoryIDInContext(req, "lab-123")
 
 	rec := httptest.NewRecorder()
 	router.ServeHTTP(rec, req)
@@ -273,9 +279,9 @@ func TestClientHandler_Update_NotFound(t *testing.T) {
 	}
 
 	body, _ := json.Marshal(reqBody)
-	req := httptest.NewRequest(http.MethodPut, "/clients/non-existent", bytes.NewReader(body))
+	url := addLaboratoryIDQueryParam("/clients/non-existent", "lab-123")
+	req := httptest.NewRequest(http.MethodPut, url, bytes.NewReader(body))
 	req.Header.Set("Content-Type", "application/json")
-	req = setLaboratoryIDInContext(req, "lab-123")
 
 	rec := httptest.NewRecorder()
 	router.ServeHTTP(rec, req)
@@ -309,8 +315,8 @@ func TestClientHandler_List_Success(t *testing.T) {
 	}
 	_ = clientRepo.Create(nil, c2)
 
-	req := httptest.NewRequest(http.MethodGet, "/clients", nil)
-	req = setLaboratoryIDInContext(req, "lab-123")
+	url := addLaboratoryIDQueryParam("/clients", "lab-123")
+	req := httptest.NewRequest(http.MethodGet, url, nil)
 
 	rec := httptest.NewRecorder()
 	router.ServeHTTP(rec, req)
@@ -333,8 +339,8 @@ func TestClientHandler_List_Empty(t *testing.T) {
 	router, _, _, labRepo := setupTestRouter()
 	createTestLaboratory(labRepo, "lab-123")
 
-	req := httptest.NewRequest(http.MethodGet, "/clients", nil)
-	req = setLaboratoryIDInContext(req, "lab-123")
+	url := addLaboratoryIDQueryParam("/clients", "lab-123")
+	req := httptest.NewRequest(http.MethodGet, url, nil)
 
 	rec := httptest.NewRecorder()
 	router.ServeHTTP(rec, req)
@@ -358,8 +364,8 @@ func TestClientHandler_Delete_Success(t *testing.T) {
 	createTestLaboratory(labRepo, "lab-123")
 	createTestClient(clientRepo, "client-123", "lab-123")
 
-	req := httptest.NewRequest(http.MethodDelete, "/clients/client-123", nil)
-	req = setLaboratoryIDInContext(req, "lab-123")
+	url := addLaboratoryIDQueryParam("/clients/client-123", "lab-123")
+	req := httptest.NewRequest(http.MethodDelete, url, nil)
 
 	rec := httptest.NewRecorder()
 	router.ServeHTTP(rec, req)
@@ -369,8 +375,8 @@ func TestClientHandler_Delete_Success(t *testing.T) {
 	}
 
 	// Verify it's deleted
-	req = httptest.NewRequest(http.MethodGet, "/clients/client-123", nil)
-	req = setLaboratoryIDInContext(req, "lab-123")
+	url = addLaboratoryIDQueryParam("/clients/client-123", "lab-123")
+	req = httptest.NewRequest(http.MethodGet, url, nil)
 	rec = httptest.NewRecorder()
 	router.ServeHTTP(rec, req)
 
@@ -383,8 +389,8 @@ func TestClientHandler_Delete_NotFound(t *testing.T) {
 	router, _, _, labRepo := setupTestRouter()
 	createTestLaboratory(labRepo, "lab-123")
 
-	req := httptest.NewRequest(http.MethodDelete, "/clients/non-existent", nil)
-	req = setLaboratoryIDInContext(req, "lab-123")
+	url := addLaboratoryIDQueryParam("/clients/non-existent", "lab-123")
+	req := httptest.NewRequest(http.MethodDelete, url, nil)
 
 	rec := httptest.NewRecorder()
 	router.ServeHTTP(rec, req)
@@ -400,9 +406,9 @@ func TestClientHandler_LaboratoryScopedAccess(t *testing.T) {
 	createTestLaboratory(labRepo, "lab-456")
 	createTestClient(clientRepo, "client-123", "lab-123")
 
-	// Try to access client from lab-123 using lab-456 context
-	req := httptest.NewRequest(http.MethodGet, "/clients/client-123", nil)
-	req = setLaboratoryIDInContext(req, "lab-456")
+	// Try to access client from lab-123 using lab-456 query parameter
+	url := addLaboratoryIDQueryParam("/clients/client-123", "lab-456")
+	req := httptest.NewRequest(http.MethodGet, url, nil)
 
 	rec := httptest.NewRecorder()
 	router.ServeHTTP(rec, req)

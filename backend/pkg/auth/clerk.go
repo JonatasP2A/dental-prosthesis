@@ -19,8 +19,6 @@ type ContextKey string
 const (
 	// UserIDKey is the context key for user ID
 	UserIDKey ContextKey = "user_id"
-	// LaboratoryIDKey is the context key for laboratory ID
-	LaboratoryIDKey ContextKey = "laboratory_id"
 )
 
 // ClerkConfig holds Clerk configuration
@@ -43,15 +41,9 @@ type JWKStore struct {
 
 // Claims represents JWT claims from Clerk
 type Claims struct {
-	Sub          string `json:"sub"`
-	LaboratoryID string `json:"laboratory_id"`
-	Exp          int64  `json:"exp"`
-	Iat          int64  `json:"iat"`
-}
-
-// CustomClaims represents custom JWT claims that may include laboratory_id
-type CustomClaims struct {
-	LaboratoryID string `json:"laboratory_id"`
+	Sub string `json:"sub"`
+	Exp int64  `json:"exp"`
+	Iat int64  `json:"iat"`
 }
 
 // NewClerkMiddleware creates a new Clerk middleware
@@ -99,17 +91,8 @@ func (m *ClerkMiddleware) Authenticate() gin.HandlerFunc {
 			return
 		}
 
-		// Check if laboratory_id claim exists
-		if claims.LaboratoryID == "" {
-			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{
-				"error": "missing laboratory_id claim",
-			})
-			return
-		}
-
-		// Set claims in context
+		// Set user ID in context
 		ctx := context.WithValue(c.Request.Context(), UserIDKey, claims.Sub)
-		ctx = context.WithValue(ctx, LaboratoryIDKey, claims.LaboratoryID)
 		c.Request = c.Request.WithContext(ctx)
 
 		c.Next()
@@ -143,24 +126,13 @@ func (m *ClerkMiddleware) validateToken(ctx context.Context, tokenString string)
 		m.setJWK(jwk)
 	}
 
-	// Verify the token signature and claims with custom claims parsing
-	var customClaims *CustomClaims
+	// Verify the token signature and claims
 	verifiedClaims, err := jwt.Verify(ctx, &jwt.VerifyParams{
 		Token: tokenString,
 		JWK:   jwk,
-		CustomClaimsConstructor: func(_ context.Context) any {
-			return &CustomClaims{}
-		},
 	})
 	if err != nil {
 		return nil, fmt.Errorf("token verification failed: %w", err)
-	}
-
-	// Extract custom claims if present
-	if verifiedClaims.Custom != nil {
-		if cc, ok := verifiedClaims.Custom.(*CustomClaims); ok {
-			customClaims = cc
-		}
 	}
 
 	// Convert Clerk claims to our Claims struct
@@ -176,11 +148,6 @@ func (m *ClerkMiddleware) validateToken(ctx context.Context, tokenString string)
 	// Extract issued at time
 	if verifiedClaims.IssuedAt != nil {
 		claims.Iat = *verifiedClaims.IssuedAt
-	}
-
-	// Extract laboratory_id from custom claims
-	if customClaims != nil && customClaims.LaboratoryID != "" {
-		claims.LaboratoryID = customClaims.LaboratoryID
 	}
 
 	return claims, nil
@@ -208,11 +175,9 @@ func GetUserID(ctx context.Context) string {
 	return ""
 }
 
-// GetLaboratoryID extracts laboratory ID from context
+// GetLaboratoryID returns empty string (laboratory_id is no longer extracted from JWT)
+// Handlers should extract laboratory_id from query parameters instead
 func GetLaboratoryID(ctx context.Context) string {
-	if v := ctx.Value(LaboratoryIDKey); v != nil {
-		return v.(string)
-	}
 	return ""
 }
 

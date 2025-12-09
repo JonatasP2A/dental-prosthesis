@@ -93,6 +93,26 @@ PUT    /api/v1/laboratories/:id # Update laboratory
 DELETE /api/v1/laboratories/:id # Delete laboratory (soft delete)
 ```
 
+#### Clients
+```
+POST   /api/v1/clients?laboratory_id=xxx     # Create client
+GET    /api/v1/clients?laboratory_id=xxx     # List clients
+GET    /api/v1/clients/:id?laboratory_id=xxx # Get client by ID
+PUT    /api/v1/clients/:id?laboratory_id=xxx # Update client
+DELETE /api/v1/clients/:id?laboratory_id=xxx # Delete client (soft delete)
+```
+
+#### Orders
+```
+POST   /api/v1/orders?laboratory_id=xxx           # Create order
+GET    /api/v1/orders?laboratory_id=xxx           # List orders
+GET    /api/v1/orders/:id?laboratory_id=xxx        # Get order by ID
+PUT    /api/v1/orders/:id?laboratory_id=xxx        # Update order
+PATCH  /api/v1/orders/:id/status?laboratory_id=xxx # Update order status
+DELETE /api/v1/orders/:id?laboratory_id=xxx        # Delete order (soft delete)
+GET    /api/v1/clients/:id/orders?laboratory_id=xxx # List orders by client
+```
+
 #### Example: Create Laboratory
 ```bash
 curl -X POST http://localhost:8080/api/v1/laboratories \
@@ -110,6 +130,31 @@ curl -X POST http://localhost:8080/api/v1/laboratories \
       "country": "Brazil"
     }
   }'
+```
+
+#### Example: Create Client (requires laboratory_id query parameter)
+```bash
+curl -X POST "http://localhost:8080/api/v1/clients?laboratory_id=lab-123" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <your-clerk-jwt>" \
+  -d '{
+    "name": "Dr. João Silva",
+    "email": "joao@clinicadental.com",
+    "phone": "+5511999999999",
+    "address": {
+      "street": "Av. Paulista, 1000",
+      "city": "São Paulo",
+      "state": "SP",
+      "postal_code": "01310-100",
+      "country": "Brazil"
+    }
+  }'
+```
+
+#### Example: List Clients (requires laboratory_id query parameter)
+```bash
+curl -X GET "http://localhost:8080/api/v1/clients?laboratory_id=lab-123" \
+  -H "Authorization: Bearer <your-clerk-jwt>"
 ```
 
 ### Testing
@@ -172,14 +217,43 @@ The API uses Clerk for authentication. To access protected endpoints:
 
 1. Set up a Clerk application at [clerk.com](https://clerk.com)
 2. Configure your frontend with `@clerk/nextjs`
-3. Add `laboratory_id` to user's public metadata or JWT claims
-4. Include the JWT token in the `Authorization` header:
+3. Include the JWT token in the `Authorization` header:
    ```
    Authorization: Bearer <your-jwt-token>
+   ```
+4. **Important**: All API requests that require laboratory context must include `laboratory_id` as a query parameter:
+   ```
+   GET /api/v1/clients?laboratory_id=lab-123
+   POST /api/v1/orders?laboratory_id=lab-123
    ```
 
 ### JWT Claims
 The middleware expects the following claims:
 - `sub` - User ID
-- `laboratory_id` - Laboratory ID (custom claim)
 - `exp` - Expiration timestamp
+
+### Laboratory Context
+**Breaking Change**: `laboratory_id` is no longer extracted from JWT tokens. Instead, it must be provided as a query parameter in all API requests that require laboratory context:
+
+- **Client endpoints**: All client operations require `?laboratory_id=xxx`
+- **Order endpoints**: All order operations require `?laboratory_id=xxx`
+- **Laboratory endpoints**: Laboratory endpoints do not require `laboratory_id` query parameter
+
+**Example:**
+```bash
+# List clients for a laboratory
+GET /api/v1/clients?laboratory_id=lab-123
+Authorization: Bearer <your-jwt-token>
+
+# Create an order
+POST /api/v1/orders?laboratory_id=lab-123
+Authorization: Bearer <your-jwt-token>
+Content-Type: application/json
+
+{
+  "client_id": "client-456",
+  "prosthesis": [...]
+}
+```
+
+If `laboratory_id` query parameter is missing, the API will return HTTP 400 Bad Request.

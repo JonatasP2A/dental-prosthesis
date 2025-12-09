@@ -10,7 +10,6 @@ import (
 	orderapp "github.com/JonatasP2A/dental-prosthesis/backend/internal/application/order"
 	domainerrors "github.com/JonatasP2A/dental-prosthesis/backend/internal/domain/errors"
 	"github.com/JonatasP2A/dental-prosthesis/backend/internal/domain/order"
-	"github.com/JonatasP2A/dental-prosthesis/backend/pkg/auth"
 )
 
 // OrderHandler handles HTTP requests for order operations
@@ -23,13 +22,22 @@ func NewOrderHandler(service *orderapp.Service) *OrderHandler {
 	return &OrderHandler{service: service}
 }
 
+// getLaboratoryID extracts laboratory_id from query parameter
+func (h *OrderHandler) getLaboratoryID(c *gin.Context) (string, error) {
+	laboratoryID := c.Query("laboratory_id")
+	if laboratoryID == "" {
+		return "", errors.New("laboratory_id query parameter is required")
+	}
+	return laboratoryID, nil
+}
+
 // Create handles POST /api/v1/orders
 func (h *OrderHandler) Create(c *gin.Context) {
-	// Get laboratory ID from JWT claims
-	laboratoryID := auth.GetLaboratoryID(c.Request.Context())
-	if laboratoryID == "" {
+	// Get laboratory ID from query parameter
+	laboratoryID, err := h.getLaboratoryID(c)
+	if err != nil {
 		c.JSON(http.StatusBadRequest, dto.ErrorResponse{
-			Error: "laboratory_id not found in token",
+			Error: err.Error(),
 		})
 		return
 	}
@@ -59,11 +67,11 @@ func (h *OrderHandler) Create(c *gin.Context) {
 
 // Get handles GET /api/v1/orders/:id
 func (h *OrderHandler) Get(c *gin.Context) {
-	// Get laboratory ID from JWT claims
-	laboratoryID := auth.GetLaboratoryID(c.Request.Context())
-	if laboratoryID == "" {
+	// Get laboratory ID from query parameter
+	laboratoryID, err := h.getLaboratoryID(c)
+	if err != nil {
 		c.JSON(http.StatusBadRequest, dto.ErrorResponse{
-			Error: "laboratory_id not found in token",
+			Error: err.Error(),
 		})
 		return
 	}
@@ -87,11 +95,11 @@ func (h *OrderHandler) Get(c *gin.Context) {
 
 // Update handles PUT /api/v1/orders/:id
 func (h *OrderHandler) Update(c *gin.Context) {
-	// Get laboratory ID from JWT claims
-	laboratoryID := auth.GetLaboratoryID(c.Request.Context())
-	if laboratoryID == "" {
+	// Get laboratory ID from query parameter
+	laboratoryID, err := h.getLaboratoryID(c)
+	if err != nil {
 		c.JSON(http.StatusBadRequest, dto.ErrorResponse{
-			Error: "laboratory_id not found in token",
+			Error: err.Error(),
 		})
 		return
 	}
@@ -129,11 +137,11 @@ func (h *OrderHandler) Update(c *gin.Context) {
 
 // UpdateStatus handles PATCH /api/v1/orders/:id/status
 func (h *OrderHandler) UpdateStatus(c *gin.Context) {
-	// Get laboratory ID from JWT claims
-	laboratoryID := auth.GetLaboratoryID(c.Request.Context())
-	if laboratoryID == "" {
+	// Get laboratory ID from query parameter
+	laboratoryID, err := h.getLaboratoryID(c)
+	if err != nil {
 		c.JSON(http.StatusBadRequest, dto.ErrorResponse{
-			Error: "laboratory_id not found in token",
+			Error: err.Error(),
 		})
 		return
 	}
@@ -179,11 +187,11 @@ func (h *OrderHandler) UpdateStatus(c *gin.Context) {
 
 // List handles GET /api/v1/orders
 func (h *OrderHandler) List(c *gin.Context) {
-	// Get laboratory ID from JWT claims
-	laboratoryID := auth.GetLaboratoryID(c.Request.Context())
-	if laboratoryID == "" {
+	// Get laboratory ID from query parameter
+	laboratoryID, err := h.getLaboratoryID(c)
+	if err != nil {
 		c.JSON(http.StatusBadRequest, dto.ErrorResponse{
-			Error: "laboratory_id not found in token",
+			Error: err.Error(),
 		})
 		return
 	}
@@ -199,11 +207,11 @@ func (h *OrderHandler) List(c *gin.Context) {
 
 // ListByClient handles GET /api/v1/clients/:id/orders
 func (h *OrderHandler) ListByClient(c *gin.Context) {
-	// Get laboratory ID from JWT claims
-	laboratoryID := auth.GetLaboratoryID(c.Request.Context())
-	if laboratoryID == "" {
+	// Get laboratory ID from query parameter
+	laboratoryID, err := h.getLaboratoryID(c)
+	if err != nil {
 		c.JSON(http.StatusBadRequest, dto.ErrorResponse{
-			Error: "laboratory_id not found in token",
+			Error: err.Error(),
 		})
 		return
 	}
@@ -227,11 +235,11 @@ func (h *OrderHandler) ListByClient(c *gin.Context) {
 
 // Delete handles DELETE /api/v1/orders/:id
 func (h *OrderHandler) Delete(c *gin.Context) {
-	// Get laboratory ID from JWT claims
-	laboratoryID := auth.GetLaboratoryID(c.Request.Context())
-	if laboratoryID == "" {
+	// Get laboratory ID from query parameter
+	laboratoryID, err := h.getLaboratoryID(c)
+	if err != nil {
 		c.JSON(http.StatusBadRequest, dto.ErrorResponse{
-			Error: "laboratory_id not found in token",
+			Error: err.Error(),
 		})
 		return
 	}
@@ -244,7 +252,7 @@ func (h *OrderHandler) Delete(c *gin.Context) {
 		return
 	}
 
-	err := h.service.DeleteOrder(c.Request.Context(), id, laboratoryID)
+	err = h.service.DeleteOrder(c.Request.Context(), id, laboratoryID)
 	if err != nil {
 		h.handleError(c, err)
 		return
