@@ -16,20 +16,20 @@ import (
 	"github.com/JonatasP2A/dental-prosthesis/backend/internal/domain/laboratory"
 )
 
-// mockIDGenerator is a mock ID generator for testing
-type mockIDGenerator struct {
+// mockLabIDGenerator is a mock ID generator for testing
+type mockLabIDGenerator struct {
 	id string
 }
 
-func (m *mockIDGenerator) Generate() string {
+func (m *mockLabIDGenerator) Generate() string {
 	return m.id
 }
 
-func setupTestRouter() (*gin.Engine, *labapp.Service, *memory.LaboratoryRepository) {
+func setupLabTestRouter() (*gin.Engine, *labapp.Service, *memory.LaboratoryRepository) {
 	gin.SetMode(gin.TestMode)
 
 	repo := memory.NewLaboratoryRepository()
-	idGen := &mockIDGenerator{id: "test-id-123"}
+	idGen := &mockLabIDGenerator{id: "test-id-123"}
 	svc := labapp.NewService(repo, idGen)
 	handler := NewLaboratoryHandler(svc)
 
@@ -43,7 +43,7 @@ func setupTestRouter() (*gin.Engine, *labapp.Service, *memory.LaboratoryReposito
 	return r, svc, repo
 }
 
-func createTestLaboratory(repo *memory.LaboratoryRepository, id string) {
+func createTestLaboratoryForLab(repo *memory.LaboratoryRepository, id string) {
 	lab := &laboratory.Laboratory{
 		ID:    id,
 		Name:  "Test Lab",
@@ -63,7 +63,7 @@ func createTestLaboratory(repo *memory.LaboratoryRepository, id string) {
 }
 
 func TestLaboratoryHandler_Create_Success(t *testing.T) {
-	router, _, _ := setupTestRouter()
+	router, _, _ := setupLabTestRouter()
 
 	reqBody := dto.CreateLaboratoryRequest{
 		Name:  "New Lab",
@@ -100,7 +100,7 @@ func TestLaboratoryHandler_Create_Success(t *testing.T) {
 }
 
 func TestLaboratoryHandler_Create_InvalidBody(t *testing.T) {
-	router, _, _ := setupTestRouter()
+	router, _, _ := setupLabTestRouter()
 
 	req := httptest.NewRequest(http.MethodPost, "/laboratories", bytes.NewReader([]byte("invalid json")))
 	req.Header.Set("Content-Type", "application/json")
@@ -114,8 +114,8 @@ func TestLaboratoryHandler_Create_InvalidBody(t *testing.T) {
 }
 
 func TestLaboratoryHandler_Get_Success(t *testing.T) {
-	router, _, repo := setupTestRouter()
-	createTestLaboratory(repo, "lab-123")
+	router, _, repo := setupLabTestRouter()
+	createTestLaboratoryForLab(repo, "lab-123")
 
 	req := httptest.NewRequest(http.MethodGet, "/laboratories/lab-123", nil)
 	rec := httptest.NewRecorder()
@@ -136,7 +136,7 @@ func TestLaboratoryHandler_Get_Success(t *testing.T) {
 }
 
 func TestLaboratoryHandler_Get_NotFound(t *testing.T) {
-	router, _, _ := setupTestRouter()
+	router, _, _ := setupLabTestRouter()
 
 	req := httptest.NewRequest(http.MethodGet, "/laboratories/non-existent", nil)
 	rec := httptest.NewRecorder()
@@ -148,8 +148,8 @@ func TestLaboratoryHandler_Get_NotFound(t *testing.T) {
 }
 
 func TestLaboratoryHandler_Update_Success(t *testing.T) {
-	router, _, repo := setupTestRouter()
-	createTestLaboratory(repo, "lab-123")
+	router, _, repo := setupLabTestRouter()
+	createTestLaboratoryForLab(repo, "lab-123")
 
 	reqBody := dto.UpdateLaboratoryRequest{
 		Name:  "Updated Lab",
@@ -186,7 +186,7 @@ func TestLaboratoryHandler_Update_Success(t *testing.T) {
 }
 
 func TestLaboratoryHandler_Update_NotFound(t *testing.T) {
-	router, _, _ := setupTestRouter()
+	router, _, _ := setupLabTestRouter()
 
 	reqBody := dto.UpdateLaboratoryRequest{
 		Name:  "Updated Lab",
@@ -214,8 +214,8 @@ func TestLaboratoryHandler_Update_NotFound(t *testing.T) {
 }
 
 func TestLaboratoryHandler_List_Success(t *testing.T) {
-	router, _, repo := setupTestRouter()
-	createTestLaboratory(repo, "lab-1")
+	router, _, repo := setupLabTestRouter()
+	createTestLaboratoryForLab(repo, "lab-1")
 
 	// Create a second lab with different email
 	lab2 := &laboratory.Laboratory{
@@ -254,7 +254,7 @@ func TestLaboratoryHandler_List_Success(t *testing.T) {
 }
 
 func TestLaboratoryHandler_List_Empty(t *testing.T) {
-	router, _, _ := setupTestRouter()
+	router, _, _ := setupLabTestRouter()
 
 	req := httptest.NewRequest(http.MethodGet, "/laboratories", nil)
 	rec := httptest.NewRecorder()
@@ -275,8 +275,8 @@ func TestLaboratoryHandler_List_Empty(t *testing.T) {
 }
 
 func TestLaboratoryHandler_Delete_Success(t *testing.T) {
-	router, _, repo := setupTestRouter()
-	createTestLaboratory(repo, "lab-123")
+	router, _, repo := setupLabTestRouter()
+	createTestLaboratoryForLab(repo, "lab-123")
 
 	req := httptest.NewRequest(http.MethodDelete, "/laboratories/lab-123", nil)
 	rec := httptest.NewRecorder()
@@ -297,7 +297,7 @@ func TestLaboratoryHandler_Delete_Success(t *testing.T) {
 }
 
 func TestLaboratoryHandler_Delete_NotFound(t *testing.T) {
-	router, _, _ := setupTestRouter()
+	router, _, _ := setupLabTestRouter()
 
 	req := httptest.NewRequest(http.MethodDelete, "/laboratories/non-existent", nil)
 	rec := httptest.NewRecorder()
