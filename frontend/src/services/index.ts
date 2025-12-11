@@ -1,0 +1,5 @@
+export { laboratoryService } from './laboratory'
+export { clientService } from './client'
+export { orderService } from './order'
+export { prosthesisService } from './prosthesis'
+export { technicianService } from './technician'

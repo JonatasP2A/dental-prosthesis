@@ -1,96 +1,135 @@
-# Dental Prosthesis Platform - Frontend
+# Dental Lab Pro - Frontend
 
-Next.js frontend application with Clerk authentication for the Dental Prosthesis Platform.
+Admin dashboard for dental prosthesis laboratory management, built on [shadcn-admin](https://github.com/satnaing/shadcn-admin).
+
+## Features
+
+- 🔐 **Clerk Authentication** - Secure sign-in/sign-up with Clerk
+- 🏠 **Dashboard** - Overview of laboratory metrics and order status
+- 🏢 **Laboratory Management** - Manage dental prosthesis laboratories
+- 👥 **Client Management** - Track dental clinic clients
+- 📋 **Order Management** - Track prosthesis orders through production workflow
+- 🦷 **Prosthesis Catalog** - Manage prosthesis types and materials
+- 👷 **Technician Management** - Manage laboratory staff
+- 🌙 **Dark Mode** - Light and dark theme support
+- 📱 **Responsive** - Works on desktop, tablet, and mobile
+
+## Tech Stack
+
+- **Framework**: [Vite](https://vitejs.dev/) + [React 19](https://react.dev/)
+- **Routing**: [TanStack Router](https://tanstack.com/router)
+- **Data Fetching**: [TanStack Query](https://tanstack.com/query)
+- **UI Components**: [shadcn/ui](https://ui.shadcn.com/)
+- **Styling**: [Tailwind CSS v4](https://tailwindcss.com/)
+- **Authentication**: [Clerk](https://clerk.com/)
+- **Form Handling**: [React Hook Form](https://react-hook-form.com/) + [Zod](https://zod.dev/)
+- **HTTP Client**: [Axios](https://axios-http.com/)
 
 ## Getting Started
 
 ### Prerequisites
 
-- Node.js 18+ installed
-- Clerk account (sign up at https://clerk.com)
+- Node.js 20.19+ or 22.12+
+- pnpm (recommended)
 
 ### Installation
 
 1. Install dependencies:
 
 ```bash
-npm install
+pnpm install
 ```
 
-2. Set up environment variables:
-
-Copy `.env.local.example` to `.env.local`:
+2. Create environment file:
 
 ```bash
 cp .env.local.example .env.local
 ```
 
-3. Get your Clerk keys:
+3. Configure environment variables in `.env.local`:
 
-- Go to [Clerk Dashboard API Keys](https://dashboard.clerk.com/last-active?path=api-keys)
-- Copy your **Publishable Key** and **Secret Key**
-- Paste them into `.env.local`:
+```env
+# Clerk Authentication (required)
+VITE_CLERK_PUBLISHABLE_KEY=pk_test_your_clerk_publishable_key
 
-```bash
-NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_...
-CLERK_SECRET_KEY=sk_test_...
+# Backend API (required)
+VITE_API_BASE_URL=http://localhost:8080
 ```
 
-4. Run the development server:
+4. Start the development server:
 
 ```bash
-npm run dev
+pnpm dev
 ```
 
-5. Open [http://localhost:3000](http://localhost:3000) in your browser.
+5. Open [http://localhost:5173](http://localhost:5173) in your browser.
 
 ## Project Structure
 
 ```
-frontend/
-├── app/                    # Next.js App Router pages
-│   ├── layout.tsx         # Root layout with ClerkProvider
-│   ├── page.tsx           # Home page
-│   └── globals.css        # Global styles
-├── proxy.ts               # Clerk middleware
-├── package.json
-├── tsconfig.json
-└── tailwind.config.ts     # Tailwind CSS configuration
+src/
+├── assets/          # Static assets and icons
+├── components/
+│   ├── ui/          # shadcn/ui components
+│   ├── layout/      # Layout components (sidebar, header)
+│   └── ...          # Shared components
+├── context/         # React context providers
+├── features/        # Feature modules
+│   ├── dashboard/
+│   ├── laboratories/
+│   ├── clients/
+│   ├── orders/
+│   ├── prostheses/
+│   └── technicians/
+├── hooks/           # Custom React hooks
+├── lib/             # Utilities and API client
+├── routes/          # TanStack Router routes
+├── services/        # API service layer
+├── stores/          # Zustand stores
+├── styles/          # Global styles
+└── types/           # TypeScript type definitions
 ```
-
-## Features
-
-- ✅ Clerk authentication integration
-- ✅ Sign in/Sign up functionality
-- ✅ Protected routes
-- ✅ User profile management
-- ✅ Responsive design with Tailwind CSS
 
 ## Available Scripts
 
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm start` - Start production server
-- `npm run lint` - Run ESLint
+| Command | Description |
+|---------|-------------|
+| `pnpm dev` | Start development server |
+| `pnpm build` | Build for production |
+| `pnpm preview` | Preview production build |
+| `pnpm lint` | Run ESLint |
+| `pnpm format` | Format code with Prettier |
+| `pnpm format:check` | Check code formatting |
 
-## Clerk Integration
+## API Integration
 
-This project uses Clerk's Next.js SDK with the App Router approach:
+The frontend communicates with the Go backend via REST API. Authentication tokens from Clerk are automatically injected into API requests.
 
-- **Middleware**: `proxy.ts` uses `clerkMiddleware()` from `@clerk/nextjs/server`
-- **Provider**: `<ClerkProvider>` wraps the app in `app/layout.tsx`
-- **Components**: Uses Clerk's React components (`SignInButton`, `SignUpButton`, `UserButton`, etc.)
+### Services
 
-## Environment Variables
+- `laboratoryService` - Laboratory CRUD operations
+- `clientService` - Client CRUD operations  
+- `orderService` - Order management and status updates
+- `prosthesisService` - Prosthesis catalog operations
+- `technicianService` - Technician CRUD operations
 
-Required environment variables (in `.env.local`):
+## Customization
 
-- `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` - Your Clerk publishable key
-- `CLERK_SECRET_KEY` - Your Clerk secret key
-- `NEXT_PUBLIC_API_URL` - Backend API URL (optional, defaults to http://localhost:8080)
+### Adding New Routes
 
-## Learn More
+1. Create a new route file in `src/routes/_authenticated/`
+2. Create a feature component in `src/features/`
+3. Add navigation item in `src/components/layout/data/sidebar-data.ts`
+4. Run `pnpm dev` to regenerate the route tree
 
-- [Next.js Documentation](https://nextjs.org/docs)
-- [Clerk Documentation](https://clerk.com/docs)
-- [Clerk Next.js Quickstart](https://clerk.com/docs/quickstarts/nextjs)
+### Theming
+
+Theme configuration is in `src/styles/theme.css`. The app uses Tailwind CSS with CSS custom properties for theming.
+
+## Credits
+
+Based on [shadcn-admin](https://github.com/satnaing/shadcn-admin) by [@satnaing](https://github.com/satnaing).
+
+## License
+
+MIT
