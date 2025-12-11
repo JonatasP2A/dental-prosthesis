@@ -10,6 +10,7 @@ import (
 	labapp "github.com/JonatasP2A/dental-prosthesis/backend/internal/application/laboratory"
 	orderapp "github.com/JonatasP2A/dental-prosthesis/backend/internal/application/order"
 	prosthesisapp "github.com/JonatasP2A/dental-prosthesis/backend/internal/application/prosthesis"
+	techapp "github.com/JonatasP2A/dental-prosthesis/backend/internal/application/technician"
 	"github.com/JonatasP2A/dental-prosthesis/backend/internal/config"
 	"github.com/JonatasP2A/dental-prosthesis/backend/pkg/auth"
 	"github.com/JonatasP2A/dental-prosthesis/backend/pkg/uuid"
@@ -30,18 +31,21 @@ func main() {
 	clientRepo := memory.NewClientRepository()
 	orderRepo := memory.NewOrderRepository()
 	prosthesisRepo := memory.NewProsthesisRepository()
+	techRepo := memory.NewTechnicianRepository()
 
 	// Services
 	labService := labapp.NewService(labRepo, idGen)
 	clientService := clientapp.NewService(clientRepo, labRepo, idGen)
 	orderService := orderapp.NewService(orderRepo, clientRepo, idGen)
 	prosthesisService := prosthesisapp.NewService(prosthesisRepo, labRepo, idGen)
+	techService := techapp.NewService(techRepo, labRepo, idGen)
 
 	// Handlers
 	labHandler := handler.NewLaboratoryHandler(labService)
 	clientHandler := handler.NewClientHandler(clientService)
 	orderHandler := handler.NewOrderHandler(orderService)
 	prosthesisHandler := handler.NewProsthesisHandler(prosthesisService)
+	techHandler := handler.NewTechnicianHandler(techService)
 
 	// Initialize Clerk middleware (optional - only if configured)
 	var clerkMiddleware *auth.ClerkMiddleware
@@ -60,6 +64,7 @@ func main() {
 		ClientHandler:     clientHandler,
 		OrderHandler:      orderHandler,
 		ProsthesisHandler: prosthesisHandler,
+		TechnicianHandler: techHandler,
 		ClerkMiddleware:   clerkMiddleware,
 	})
 

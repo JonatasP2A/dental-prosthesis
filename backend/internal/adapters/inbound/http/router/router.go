@@ -13,6 +13,7 @@ type Config struct {
 	ClientHandler     *handler.ClientHandler
 	OrderHandler      *handler.OrderHandler
 	ProsthesisHandler *handler.ProsthesisHandler
+	TechnicianHandler *handler.TechnicianHandler
 	ClerkMiddleware   *auth.ClerkMiddleware
 }
 
@@ -89,6 +90,21 @@ func New(cfg Config) *gin.Engine {
 			prostheses.GET("/:id", cfg.ProsthesisHandler.Get)
 			prostheses.PUT("/:id", cfg.ProsthesisHandler.Update)
 			prostheses.DELETE("/:id", cfg.ProsthesisHandler.Delete)
+		}
+	}
+
+	// Technician routes (protected)
+	if cfg.TechnicianHandler != nil {
+		technicians := v1.Group("/technicians")
+		if cfg.ClerkMiddleware != nil {
+			technicians.Use(cfg.ClerkMiddleware.Authenticate())
+		}
+		{
+			technicians.POST("", cfg.TechnicianHandler.Create)
+			technicians.GET("", cfg.TechnicianHandler.List)
+			technicians.GET("/:id", cfg.TechnicianHandler.Get)
+			technicians.PUT("/:id", cfg.TechnicianHandler.Update)
+			technicians.DELETE("/:id", cfg.TechnicianHandler.Delete)
 		}
 	}
 
