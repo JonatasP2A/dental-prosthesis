@@ -1,0 +1,283 @@
+{
+  "common": {
+    "search": "Buscar",
+    "add": "Adicionar",
+    "edit": "Editar",
+    "delete": "Excluir",
+    "save": "Salvar",
+    "cancel": "Cancelar",
+    "confirm": "Confirmar",
+    "back": "Voltar",
+    "next": "Próximo",
+    "loading": "Carregando...",
+    "error": "Erro",
+    "success": "Sucesso",
+    "warning": "Aviso",
+    "info": "Informação",
+    "yes": "Sim",
+    "no": "Não",
+    "actions": "Ações",
+    "status": "Status",
+    "name": "Nome",
+    "email": "E-mail",
+    "phone": "Telefone",
+    "address": "Endereço",
+    "date": "Data",
+    "time": "Hora",
+    "description": "Descrição",
+    "notes": "Observações",
+    "type": "Tipo",
+    "view": "Visualizar",
+    "export": "Exportar",
+    "import": "Importar",
+    "filter": "Filtrar",
+    "clearFilters": "Limpar Filtros",
+    "noResults": "Nenhum resultado encontrado",
+    "showMore": "Mostrar mais",
+    "showLess": "Mostrar menos",
+    "selectAll": "Selecionar todos",
+    "deselectAll": "Desmarcar todos",
+    "selected": "selecionado(s)",
+    "rowsPerPage": "Linhas por página",
+    "of": "de",
+    "page": "Página",
+    "goToPage": "Ir para página",
+    "firstPage": "Primeira página",
+    "lastPage": "Última página",
+    "previousPage": "Página anterior",
+    "nextPage": "Próxima página"
+  },
+  "navigation": {
+    "general": "Geral",
+    "dashboard": "Painel",
+    "laboratories": "Laboratórios",
+    "clients": "Clientes",
+    "orders": "Pedidos",
+    "prostheses": "Próteses",
+    "technicians": "Técnicos",
+    "settings": "Configurações",
+    "profile": "Perfil",
+    "account": "Conta",
+    "appearance": "Aparência",
+    "notifications": "Notificações",
+    "display": "Exibição",
+    "helpCenter": "Central de Ajuda",
+    "apps": "Aplicativos",
+    "chats": "Conversas",
+    "tasks": "Tarefas",
+    "users": "Usuários"
+  },
+  "dashboard": {
+    "title": "Painel",
+    "welcome": "Bem-vindo ao seu sistema de gerenciamento de laboratório de próteses dentárias.",
+    "activeOrders": "Pedidos Ativos",
+    "inProduction": "em produção",
+    "ready": "prontos",
+    "totalClients": "Total de Clientes",
+    "newThisMonth": "novos este mês",
+    "prosthesisTypes": "Tipos de Próteses",
+    "crownsAndMore": "Coroas, pontes, dentaduras...",
+    "avgTurnaround": "Tempo Médio",
+    "days": "dias",
+    "daysFromLastMonth": "dias em relação ao mês passado",
+    "ordersOverview": "Visão Geral de Pedidos",
+    "monthlyOrderVolume": "Volume mensal de pedidos",
+    "orderStatus": "Status dos Pedidos",
+    "currentOrderDistribution": "Distribuição atual de pedidos",
+    "received": "Recebido",
+    "inProductionStatus": "Em Produção",
+    "qualityCheck": "Controle de Qualidade",
+    "readyStatus": "Pronto",
+    "deliveredThisWeek": "Entregue (esta semana)",
+    "quickActions": "Ações Rápidas",
+    "newOrder": "Novo Pedido",
+    "addClient": "Adicionar Cliente",
+    "prosthesisCatalog": "Catálogo de Próteses"
+  },
+  "clients": {
+    "title": "Clientes",
+    "description": "Gerencie seus clientes de clínicas odontológicas.",
+    "addClient": "Adicionar Cliente",
+    "clientManagement": "Gestão de Clientes",
+    "comingSoon": "Interface de gestão de clientes em breve. Esta página permitirá visualizar, criar, editar e excluir clientes de clínicas odontológicas."
+  },
+  "laboratories": {
+    "title": "Laboratórios",
+    "description": "Gerencie seus laboratórios de próteses dentárias.",
+    "addLaboratory": "Adicionar Laboratório",
+    "laboratoryManagement": "Gestão de Laboratórios",
+    "comingSoon": "Interface de gestão de laboratórios em breve. Esta página permitirá visualizar, criar, editar e excluir laboratórios."
+  },
+  "orders": {
+    "title": "Pedidos",
+    "description": "Gerencie seus pedidos de próteses dentárias.",
+    "addOrder": "Adicionar Pedido",
+    "orderManagement": "Gestão de Pedidos",
+    "comingSoon": "Interface de gestão de pedidos em breve. Esta página permitirá visualizar, criar, editar e excluir pedidos."
+  },
+  "prostheses": {
+    "title": "Próteses",
+    "description": "Gerencie seu catálogo de próteses dentárias.",
+    "addProsthesis": "Adicionar Prótese",
+    "prosthesisManagement": "Gestão de Próteses",
+    "comingSoon": "Interface de gestão de próteses em breve. Esta página permitirá visualizar, criar, editar e excluir tipos de próteses."
+  },
+  "technicians": {
+    "title": "Técnicos",
+    "description": "Gerencie seus técnicos em prótese dentária.",
+    "addTechnician": "Adicionar Técnico",
+    "technicianManagement": "Gestão de Técnicos",
+    "comingSoon": "Interface de gestão de técnicos em breve. Esta página permitirá visualizar, criar, editar e excluir técnicos."
+  },
+  "users": {
+    "title": "Usuários",
+    "description": "Gerencie os usuários do sistema.",
+    "addUser": "Adicionar Usuário",
+    "userManagement": "Gestão de Usuários",
+    "inviteUser": "Convidar Usuário"
+  },
+  "settings": {
+    "title": "Configurações",
+    "description": "Gerencie suas configurações e preferências.",
+    "profile": {
+      "title": "Perfil",
+      "description": "Gerencie suas informações de perfil."
+    },
+    "account": {
+      "title": "Conta",
+      "description": "Gerencie as configurações da sua conta."
+    },
+    "appearance": {
+      "title": "Aparência",
+      "description": "Personalize a aparência do aplicativo. Alterne automaticamente entre temas claro e escuro."
+    },
+    "notifications": {
+      "title": "Notificações",
+      "description": "Gerencie suas preferências de notificação."
+    },
+    "display": {
+      "title": "Exibição",
+      "description": "Configure as opções de exibição."
+    },
+    "language": {
+      "title": "Idioma",
+      "description": "Selecione o idioma do sistema.",
+      "selectLanguage": "Selecionar idioma"
+    }
+  },
+  "auth": {
+    "signIn": "Entrar",
+    "signUp": "Cadastrar",
+    "signOut": "Sair",
+    "forgotPassword": "Esqueceu a senha?",
+    "resetPassword": "Redefinir Senha",
+    "email": "E-mail",
+    "password": "Senha",
+    "confirmPassword": "Confirmar Senha",
+    "rememberMe": "Lembrar-me",
+    "createAccount": "Criar Conta",
+    "alreadyHaveAccount": "Já tem uma conta?",
+    "dontHaveAccount": "Não tem uma conta?",
+    "verifyEmail": "Verificar E-mail",
+    "enterCode": "Digite o código",
+    "resendCode": "Reenviar código",
+    "signOutConfirmTitle": "Sair da conta?",
+    "signOutConfirmDescription": "Você será desconectado desta conta. Deseja continuar?"
+  },
+  "errors": {
+    "notFound": {
+      "title": "404",
+      "subtitle": "Ops! Página Não Encontrada!",
+      "description": "Parece que a página que você está procurando não existe ou pode ter sido removida.",
+      "goBack": "Voltar",
+      "backToHome": "Voltar ao Início"
+    },
+    "unauthorized": {
+      "title": "401",
+      "subtitle": "Não Autorizado",
+      "description": "Você não está autorizado a acessar este recurso."
+    },
+    "forbidden": {
+      "title": "403",
+      "subtitle": "Acesso Proibido",
+      "description": "Você não tem permissão para acessar este recurso."
+    },
+    "serverError": {
+      "title": "500",
+      "subtitle": "Erro Interno do Servidor",
+      "description": "Algo deu errado em nossos servidores. Por favor, tente novamente mais tarde."
+    },
+    "maintenance": {
+      "title": "503",
+      "subtitle": "Em Manutenção",
+      "description": "O sistema está em manutenção. Por favor, volte mais tarde."
+    },
+    "generalError": {
+      "title": "Ops! Algo deu errado!",
+      "description": "Pedimos desculpas pelo inconveniente. Por favor, tente novamente mais tarde.",
+      "tryAgain": "Tentar Novamente"
+    },
+    "sessionExpired": "Sessão expirada!",
+    "internalServerError": "Erro Interno do Servidor!",
+    "accessForbidden": "Acesso proibido!"
+  },
+  "components": {
+    "search": {
+      "placeholder": "Buscar...",
+      "noResults": "Nenhum resultado encontrado.",
+      "searchDocs": "Pesquisar documentação..."
+    },
+    "commandMenu": {
+      "title": "Menu de Comandos",
+      "placeholder": "Digite um comando ou pesquise...",
+      "noResults": "Nenhum resultado encontrado."
+    },
+    "theme": {
+      "light": "Claro",
+      "dark": "Escuro",
+      "system": "Sistema"
+    },
+    "configDrawer": {
+      "title": "Configurações",
+      "language": "Idioma",
+      "theme": "Tema",
+      "sidebar": "Barra Lateral",
+      "layout": "Layout",
+      "direction": "Direção"
+    },
+    "confirmDialog": {
+      "areYouSure": "Tem certeza?",
+      "thisActionCannotBeUndone": "Esta ação não pode ser desfeita."
+    },
+    "dataTable": {
+      "noResults": "Nenhum resultado.",
+      "columns": "Colunas",
+      "hideColumn": "Ocultar coluna",
+      "sortAsc": "Ordenar crescente",
+      "sortDesc": "Ordenar decrescente",
+      "clearSort": "Limpar ordenação"
+    }
+  },
+  "sidebar": {
+    "team": {
+      "dentalLab": "Laboratório Dental",
+      "professional": "Profissional"
+    },
+    "navigation": "Navegação",
+    "settings": "Configurações"
+  },
+  "months": {
+    "jan": "Jan",
+    "feb": "Fev",
+    "mar": "Mar",
+    "apr": "Abr",
+    "may": "Mai",
+    "jun": "Jun",
+    "jul": "Jul",
+    "aug": "Ago",
+    "sep": "Set",
+    "oct": "Out",
+    "nov": "Nov",
+    "dec": "Dez"
+  }
+}

@@ -1,0 +1,283 @@
+{
+  "common": {
+    "search": "Search",
+    "add": "Add",
+    "edit": "Edit",
+    "delete": "Delete",
+    "save": "Save",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "back": "Back",
+    "next": "Next",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "warning": "Warning",
+    "info": "Info",
+    "yes": "Yes",
+    "no": "No",
+    "actions": "Actions",
+    "status": "Status",
+    "name": "Name",
+    "email": "Email",
+    "phone": "Phone",
+    "address": "Address",
+    "date": "Date",
+    "time": "Time",
+    "description": "Description",
+    "notes": "Notes",
+    "type": "Type",
+    "view": "View",
+    "export": "Export",
+    "import": "Import",
+    "filter": "Filter",
+    "clearFilters": "Clear Filters",
+    "noResults": "No results found",
+    "showMore": "Show more",
+    "showLess": "Show less",
+    "selectAll": "Select all",
+    "deselectAll": "Deselect all",
+    "selected": "selected",
+    "rowsPerPage": "Rows per page",
+    "of": "of",
+    "page": "Page",
+    "goToPage": "Go to page",
+    "firstPage": "First page",
+    "lastPage": "Last page",
+    "previousPage": "Previous page",
+    "nextPage": "Next page"
+  },
+  "navigation": {
+    "general": "General",
+    "dashboard": "Dashboard",
+    "laboratories": "Laboratories",
+    "clients": "Clients",
+    "orders": "Orders",
+    "prostheses": "Prostheses",
+    "technicians": "Technicians",
+    "settings": "Settings",
+    "profile": "Profile",
+    "account": "Account",
+    "appearance": "Appearance",
+    "notifications": "Notifications",
+    "display": "Display",
+    "helpCenter": "Help Center",
+    "apps": "Apps",
+    "chats": "Chats",
+    "tasks": "Tasks",
+    "users": "Users"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Welcome to your dental prosthesis laboratory management system.",
+    "activeOrders": "Active Orders",
+    "inProduction": "in production",
+    "ready": "ready",
+    "totalClients": "Total Clients",
+    "newThisMonth": "new this month",
+    "prosthesisTypes": "Prosthesis Types",
+    "crownsAndMore": "Crowns, bridges, dentures...",
+    "avgTurnaround": "Avg. Turnaround",
+    "days": "days",
+    "daysFromLastMonth": "days from last month",
+    "ordersOverview": "Orders Overview",
+    "monthlyOrderVolume": "Monthly order volume",
+    "orderStatus": "Order Status",
+    "currentOrderDistribution": "Current order distribution",
+    "received": "Received",
+    "inProductionStatus": "In Production",
+    "qualityCheck": "Quality Check",
+    "readyStatus": "Ready",
+    "deliveredThisWeek": "Delivered (this week)",
+    "quickActions": "Quick Actions",
+    "newOrder": "New Order",
+    "addClient": "Add Client",
+    "prosthesisCatalog": "Prosthesis Catalog"
+  },
+  "clients": {
+    "title": "Clients",
+    "description": "Manage your dental clinic clients.",
+    "addClient": "Add Client",
+    "clientManagement": "Client Management",
+    "comingSoon": "Client management interface coming soon. This page will allow you to view, create, edit, and delete dental clinic clients."
+  },
+  "laboratories": {
+    "title": "Laboratories",
+    "description": "Manage your dental prosthesis laboratories.",
+    "addLaboratory": "Add Laboratory",
+    "laboratoryManagement": "Laboratory Management",
+    "comingSoon": "Laboratory management interface coming soon. This page will allow you to view, create, edit, and delete laboratories."
+  },
+  "orders": {
+    "title": "Orders",
+    "description": "Manage your dental prosthesis orders.",
+    "addOrder": "Add Order",
+    "orderManagement": "Order Management",
+    "comingSoon": "Order management interface coming soon. This page will allow you to view, create, edit, and delete orders."
+  },
+  "prostheses": {
+    "title": "Prostheses",
+    "description": "Manage your dental prosthesis catalog.",
+    "addProsthesis": "Add Prosthesis",
+    "prosthesisManagement": "Prosthesis Management",
+    "comingSoon": "Prosthesis management interface coming soon. This page will allow you to view, create, edit, and delete prosthesis types."
+  },
+  "technicians": {
+    "title": "Technicians",
+    "description": "Manage your dental prosthesis technicians.",
+    "addTechnician": "Add Technician",
+    "technicianManagement": "Technician Management",
+    "comingSoon": "Technician management interface coming soon. This page will allow you to view, create, edit, and delete technicians."
+  },
+  "users": {
+    "title": "Users",
+    "description": "Manage system users.",
+    "addUser": "Add User",
+    "userManagement": "User Management",
+    "inviteUser": "Invite User"
+  },
+  "settings": {
+    "title": "Settings",
+    "description": "Manage your settings and preferences.",
+    "profile": {
+      "title": "Profile",
+      "description": "Manage your profile information."
+    },
+    "account": {
+      "title": "Account",
+      "description": "Manage your account settings."
+    },
+    "appearance": {
+      "title": "Appearance",
+      "description": "Customize the appearance of the app. Automatically switch between day and night themes."
+    },
+    "notifications": {
+      "title": "Notifications",
+      "description": "Manage your notification preferences."
+    },
+    "display": {
+      "title": "Display",
+      "description": "Configure display options."
+    },
+    "language": {
+      "title": "Language",
+      "description": "Select the system language.",
+      "selectLanguage": "Select language"
+    }
+  },
+  "auth": {
+    "signIn": "Sign In",
+    "signUp": "Sign Up",
+    "signOut": "Sign Out",
+    "forgotPassword": "Forgot Password?",
+    "resetPassword": "Reset Password",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "rememberMe": "Remember me",
+    "createAccount": "Create Account",
+    "alreadyHaveAccount": "Already have an account?",
+    "dontHaveAccount": "Don't have an account?",
+    "verifyEmail": "Verify Email",
+    "enterCode": "Enter code",
+    "resendCode": "Resend code",
+    "signOutConfirmTitle": "Sign out of account?",
+    "signOutConfirmDescription": "You will be logged out of this account. Do you want to continue?"
+  },
+  "errors": {
+    "notFound": {
+      "title": "404",
+      "subtitle": "Oops! Page Not Found!",
+      "description": "It seems like the page you're looking for does not exist or might have been removed.",
+      "goBack": "Go Back",
+      "backToHome": "Back to Home"
+    },
+    "unauthorized": {
+      "title": "401",
+      "subtitle": "Unauthorized",
+      "description": "You are not authorized to access this resource."
+    },
+    "forbidden": {
+      "title": "403",
+      "subtitle": "Access Forbidden",
+      "description": "You do not have permission to access this resource."
+    },
+    "serverError": {
+      "title": "500",
+      "subtitle": "Internal Server Error",
+      "description": "Something went wrong on our servers. Please try again later."
+    },
+    "maintenance": {
+      "title": "503",
+      "subtitle": "Under Maintenance",
+      "description": "The system is under maintenance. Please check back later."
+    },
+    "generalError": {
+      "title": "Oops! Something went wrong!",
+      "description": "We apologize for the inconvenience. Please try again later.",
+      "tryAgain": "Try Again"
+    },
+    "sessionExpired": "Session expired!",
+    "internalServerError": "Internal Server Error!",
+    "accessForbidden": "Access forbidden!"
+  },
+  "components": {
+    "search": {
+      "placeholder": "Search...",
+      "noResults": "No results found.",
+      "searchDocs": "Search documentation..."
+    },
+    "commandMenu": {
+      "title": "Command Menu",
+      "placeholder": "Type a command or search...",
+      "noResults": "No results found."
+    },
+    "theme": {
+      "light": "Light",
+      "dark": "Dark",
+      "system": "System"
+    },
+    "configDrawer": {
+      "title": "Settings",
+      "language": "Language",
+      "theme": "Theme",
+      "sidebar": "Sidebar",
+      "layout": "Layout",
+      "direction": "Direction"
+    },
+    "confirmDialog": {
+      "areYouSure": "Are you sure?",
+      "thisActionCannotBeUndone": "This action cannot be undone."
+    },
+    "dataTable": {
+      "noResults": "No results.",
+      "columns": "Columns",
+      "hideColumn": "Hide column",
+      "sortAsc": "Sort ascending",
+      "sortDesc": "Sort descending",
+      "clearSort": "Clear sort"
+    }
+  },
+  "sidebar": {
+    "team": {
+      "dentalLab": "Dental Lab",
+      "professional": "Professional"
+    },
+    "navigation": "Navigation",
+    "settings": "Settings"
+  },
+  "months": {
+    "jan": "Jan",
+    "feb": "Feb",
+    "mar": "Mar",
+    "apr": "Apr",
+    "may": "May",
+    "jun": "Jun",
+    "jul": "Jul",
+    "aug": "Aug",
+    "sep": "Sep",
+    "oct": "Oct",
+    "nov": "Nov",
+    "dec": "Dec"
+  }
+}

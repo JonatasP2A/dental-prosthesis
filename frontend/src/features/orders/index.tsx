@@ -1,4 +1,5 @@
 import { ClipboardList, Plus } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ConfigDrawer } from '@/components/config-drawer'
@@ -9,6 +10,8 @@ import { Search } from '@/components/search'
 import { ThemeSwitch } from '@/components/theme-switch'
 
 export function Orders() {
+  const { t } = useTranslation()
+
   return (
     <>
       <Header fixed>
@@ -23,14 +26,14 @@ export function Orders() {
       <Main className='flex flex-1 flex-col gap-4 sm:gap-6'>
         <div className='flex flex-wrap items-end justify-between gap-2'>
           <div>
-            <h2 className='text-2xl font-bold tracking-tight'>Orders</h2>
-            <p className='text-muted-foreground'>
-              Track and manage prosthesis orders.
-            </p>
+            <h2 className='text-2xl font-bold tracking-tight'>
+              {t('orders.title')}
+            </h2>
+            <p className='text-muted-foreground'>{t('orders.description')}</p>
           </div>
           <Button>
             <Plus className='mr-2 h-4 w-4' />
-            New Order
+            {t('orders.addOrder')}
           </Button>
         </div>
 
@@ -39,15 +42,11 @@ export function Orders() {
           <CardHeader>
             <CardTitle className='flex items-center gap-2'>
               <ClipboardList className='h-5 w-5' />
-              Order Management
+              {t('orders.orderManagement')}
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className='text-muted-foreground'>
-              Order management interface coming soon. This page will allow you
-              to view orders, create new orders, update status, and track
-              production workflow.
-            </p>
+            <p className='text-muted-foreground'>{t('orders.comingSoon')}</p>
           </CardContent>
         </Card>
       </Main>

@@ -1,4 +1,5 @@
 import { HardHat, Plus } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ConfigDrawer } from '@/components/config-drawer'
@@ -9,6 +10,8 @@ import { Search } from '@/components/search'
 import { ThemeSwitch } from '@/components/theme-switch'
 
 export function Technicians() {
+  const { t } = useTranslation()
+
   return (
     <>
       <Header fixed>
@@ -23,14 +26,16 @@ export function Technicians() {
       <Main className='flex flex-1 flex-col gap-4 sm:gap-6'>
         <div className='flex flex-wrap items-end justify-between gap-2'>
           <div>
-            <h2 className='text-2xl font-bold tracking-tight'>Technicians</h2>
+            <h2 className='text-2xl font-bold tracking-tight'>
+              {t('technicians.title')}
+            </h2>
             <p className='text-muted-foreground'>
-              Manage your laboratory technicians.
+              {t('technicians.description')}
             </p>
           </div>
           <Button>
             <Plus className='mr-2 h-4 w-4' />
-            Add Technician
+            {t('technicians.addTechnician')}
           </Button>
         </div>
 
@@ -39,13 +44,12 @@ export function Technicians() {
           <CardHeader>
             <CardTitle className='flex items-center gap-2'>
               <HardHat className='h-5 w-5' />
-              Technician Management
+              {t('technicians.technicianManagement')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <p className='text-muted-foreground'>
-              Technician management interface coming soon. This page will allow
-              you to manage lab staff, their roles, and specializations.
+              {t('technicians.comingSoon')}
             </p>
           </CardContent>
         </Card>

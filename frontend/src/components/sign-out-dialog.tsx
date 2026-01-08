@@ -1,4 +1,5 @@
 import { useClerk } from '@clerk/clerk-react'
+import { useTranslation } from 'react-i18next'
 import { ConfirmDialog } from '@/components/confirm-dialog'
 
 interface SignOutDialogProps {
@@ -7,6 +8,7 @@ interface SignOutDialogProps {
 }
 
 export function SignOutDialog({ open, onOpenChange }: SignOutDialogProps) {
+  const { t } = useTranslation()
   const { signOut } = useClerk()
 
   const handleSignOut = async () => {
@@ -17,9 +19,9 @@ export function SignOutDialog({ open, onOpenChange }: SignOutDialogProps) {
     <ConfirmDialog
       open={open}
       onOpenChange={onOpenChange}
-      title='Sign out'
-      desc='Are you sure you want to sign out? You will need to sign in again to access your account.'
-      confirmText='Sign out'
+      title={t('auth.signOut')}
+      desc={t('auth.signOutConfirmDescription')}
+      confirmText={t('auth.signOut')}
       destructive
       handleConfirm={handleSignOut}
       className='sm:max-w-sm'

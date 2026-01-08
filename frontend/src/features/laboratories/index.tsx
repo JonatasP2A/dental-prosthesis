@@ -1,4 +1,5 @@
 import { Building2, Plus } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ConfigDrawer } from '@/components/config-drawer'
@@ -9,6 +10,8 @@ import { Search } from '@/components/search'
 import { ThemeSwitch } from '@/components/theme-switch'
 
 export function Laboratories() {
+  const { t } = useTranslation()
+
   return (
     <>
       <Header fixed>
@@ -23,14 +26,16 @@ export function Laboratories() {
       <Main className='flex flex-1 flex-col gap-4 sm:gap-6'>
         <div className='flex flex-wrap items-end justify-between gap-2'>
           <div>
-            <h2 className='text-2xl font-bold tracking-tight'>Laboratories</h2>
+            <h2 className='text-2xl font-bold tracking-tight'>
+              {t('laboratories.title')}
+            </h2>
             <p className='text-muted-foreground'>
-              Manage your dental prosthesis laboratories.
+              {t('laboratories.description')}
             </p>
           </div>
           <Button>
             <Plus className='mr-2 h-4 w-4' />
-            Add Laboratory
+            {t('laboratories.addLaboratory')}
           </Button>
         </div>
 
@@ -39,13 +44,12 @@ export function Laboratories() {
           <CardHeader>
             <CardTitle className='flex items-center gap-2'>
               <Building2 className='h-5 w-5' />
-              Laboratory Management
+              {t('laboratories.laboratoryManagement')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <p className='text-muted-foreground'>
-              Laboratory management interface coming soon. This page will allow
-              you to view, create, edit, and delete laboratories.
+              {t('laboratories.comingSoon')}
             </p>
           </CardContent>
         </Card>

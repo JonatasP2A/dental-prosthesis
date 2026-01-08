@@ -1,4 +1,5 @@
 import { Plus, Users } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ConfigDrawer } from '@/components/config-drawer'
@@ -9,6 +10,8 @@ import { Search } from '@/components/search'
 import { ThemeSwitch } from '@/components/theme-switch'
 
 export function Clients() {
+  const { t } = useTranslation()
+
   return (
     <>
       <Header fixed>
@@ -23,14 +26,14 @@ export function Clients() {
       <Main className='flex flex-1 flex-col gap-4 sm:gap-6'>
         <div className='flex flex-wrap items-end justify-between gap-2'>
           <div>
-            <h2 className='text-2xl font-bold tracking-tight'>Clients</h2>
-            <p className='text-muted-foreground'>
-              Manage your dental clinic clients.
-            </p>
+            <h2 className='text-2xl font-bold tracking-tight'>
+              {t('clients.title')}
+            </h2>
+            <p className='text-muted-foreground'>{t('clients.description')}</p>
           </div>
           <Button>
             <Plus className='mr-2 h-4 w-4' />
-            Add Client
+            {t('clients.addClient')}
           </Button>
         </div>
 
@@ -39,14 +42,11 @@ export function Clients() {
           <CardHeader>
             <CardTitle className='flex items-center gap-2'>
               <Users className='h-5 w-5' />
-              Client Management
+              {t('clients.clientManagement')}
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className='text-muted-foreground'>
-              Client management interface coming soon. This page will allow you
-              to view, create, edit, and delete dental clinic clients.
-            </p>
+            <p className='text-muted-foreground'>{t('clients.comingSoon')}</p>
           </CardContent>
         </Card>
       </Main>

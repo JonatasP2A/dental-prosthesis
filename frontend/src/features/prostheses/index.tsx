@@ -1,4 +1,5 @@
 import { Package, Plus } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ConfigDrawer } from '@/components/config-drawer'
@@ -9,6 +10,8 @@ import { Search } from '@/components/search'
 import { ThemeSwitch } from '@/components/theme-switch'
 
 export function Prostheses() {
+  const { t } = useTranslation()
+
   return (
     <>
       <Header fixed>
@@ -24,15 +27,15 @@ export function Prostheses() {
         <div className='flex flex-wrap items-end justify-between gap-2'>
           <div>
             <h2 className='text-2xl font-bold tracking-tight'>
-              Prosthesis Catalog
+              {t('prostheses.title')}
             </h2>
             <p className='text-muted-foreground'>
-              Manage your prosthesis types and materials.
+              {t('prostheses.description')}
             </p>
           </div>
           <Button>
             <Plus className='mr-2 h-4 w-4' />
-            Add Prosthesis
+            {t('prostheses.addProsthesis')}
           </Button>
         </div>
 
@@ -41,14 +44,12 @@ export function Prostheses() {
           <CardHeader>
             <CardTitle className='flex items-center gap-2'>
               <Package className='h-5 w-5' />
-              Prosthesis Catalog
+              {t('prostheses.prosthesisManagement')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <p className='text-muted-foreground'>
-              Prosthesis catalog interface coming soon. This page will allow you
-              to manage prosthesis types (crowns, bridges, dentures, etc.),
-              materials, and specifications.
+              {t('prostheses.comingSoon')}
             </p>
           </CardContent>
         </Card>
